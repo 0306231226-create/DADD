@@ -1,34 +1,12 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
+const authController = require('./auth.controller');
 
-// Đăng ký
-router.post('/register', (req, res) => {
-  res.json({ message: 'Register API' })
-})
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.post('/refresh-token', authController.refresh);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
+router.post('/logout', authController.logout);
 
-// Đăng nhập
-router.post('/login', (req, res) => {
-  res.json({ message: 'Login API' })
-})
-
-// Đăng xuất
-router.post('/logout', (req, res) => {
-  res.json({ message: 'Logout API' })
-})
-
-// Refresh token
-router.post('/refresh-token', (req, res) => {
-  res.json({ message: 'Refresh token API' })
-})
-
-// Quên mật khẩu
-router.post('/forgot-password', (req, res) => {
-  res.json({ message: 'Forgot password API' })
-})
-
-// Xác nhận OTP + đổi mật khẩu
-router.post('/verify-otp', (req, res) => {
-  res.json({ message: 'Verify OTP API' })
-})
-
-module.exports = router
+module.exports = router;

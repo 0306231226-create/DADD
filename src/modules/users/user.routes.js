@@ -1,19 +1,10 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
+const userController = require('./user.controller');
+const authMiddleware = require('../../middlewares/auth.middleware');
 
-// Lấy thông tin user
-router.get('/me', (req, res) => {
-  res.json({ message: 'Get user info' })
-})
+// Tất cả các route này đều cần đăng nhập (Bearer Token)
+router.get('/profile', authMiddleware, userController.getProfile);
+router.put('/update', authMiddleware, userController.updateProfile);
 
-// Cập nhật thông tin user
-router.put('/me', (req, res) => {
-  res.json({ message: 'Update user info' })
-})
-
-// Cập nhật sở thích
-router.put('/interests', (req, res) => {
-  res.json({ message: 'Update interests' })
-})
-
-module.exports = router
+module.exports = router;

@@ -1,21 +1,12 @@
-require('dotenv').config() // PHẢI DÒNG ĐẦU
+require('dotenv').config(); // DÒNG NÀY PHẢI Ở TRÊN CÙNG
+const app = require('./app');
+const { sequelize } = require('./models');
 
-const app = require('./app')
-const sequelize = require('./config/database')
+const PORT = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000
-
-;(async () => {
-  try {
-    await sequelize.authenticate()
-    console.log('Database connected')
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`)
+sequelize.authenticate()
+    .then(() => {
+        console.log('Database connected...');
+        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     })
-  } catch (error) {
-    console.error('Unable to connect to DB:', error)
-  }
-})()
-
-
+    .catch(err => console.log('Error: ' + err));
