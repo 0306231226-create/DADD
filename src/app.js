@@ -18,9 +18,10 @@ const userRoutes = require('./modules/users/user.routes');
 const postRoutes = require('./modules/posts/post.routes');
 const voteRoutes = require('./modules/votes/vote.routes');
 const commentRoutes = require('./modules/comments/comment.routes');
+const notificationRoutes = require('./modules/notifications/notification.routes');
 
+app.use('/api/notifications', notificationRoutes);
 app.use('/api', commentRoutes);
-// 5. Đăng ký các API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
