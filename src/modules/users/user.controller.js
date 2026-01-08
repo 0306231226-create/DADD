@@ -25,6 +25,28 @@ class UserController {
             return res.status(400).json({ status: 'error', message: error.message });
         }
     }
+    async updateMyInterests(req, res) {
+    try {
+        const userId = req.user.id; // Lấy từ authMiddleware
+        const { interests } = req.body;
+
+        if (!Array.isArray(interests)) {
+            return res.status(400).json({ 
+                status: 'error', 
+                message: 'Sở thích phải là một mảng (Array)' 
+            });
+        }
+
+        await userService.updateInterests(userId, interests);
+
+        return res.json({
+            status: 'success',
+            message: 'Cập nhật sở thích thành công'
+        });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: error.message });
+    }
+}
 }
 
 module.exports = new UserController();

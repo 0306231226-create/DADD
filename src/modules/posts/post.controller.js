@@ -33,6 +33,56 @@ class PostController {
             return res.status(500).json({ status: 'error', message: error.message });
         }
     }
+    async getNewsfeed(req, res) {
+    try {
+        // req.user có thể undefined nếu không yêu cầu token bắt buộc
+        const data = await postService.getNewsfeed(req.user, req.query);
+        
+        return res.json({
+            status: 'success',
+            data: data
+        });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: error.message });
+    }
+}
+async updatePost(req, res) {
+    try {
+        const { postId } = req.params;
+        const userId = req.user.id; // Lấy từ authMiddleware
+        const updateData = req.body;
+
+        const result = await postService.updatePost(postId, userId, updateData);
+
+        return res.json({
+            status: 'success',
+            message: 'Cập nhật bài viết thành công',
+            data: result
+        });
+    } catch (error) {
+        // Trả về lỗi 403 nếu không có quyền, 404 nếu không thấy bài
+        const statusCode = error.message.includes('quyền') ? 403 : 404;
+        return res.status(statusCode).json({ 
+            status: 'error', 
+            message: error.message 
+        });
+    }
+}
+async sharePost(req, res) {
+        try {
+            const { postId } = req.params;
+            const userId = req.user.id;
+            const shared = await postService.sharePost(userId, postId);
+
+            return res.status(201).json({
+                status: 'success',
+                message: 'Đã ghi nhận lượt chia sẻ bài viết',
+                data: shared
+            });
+        } catch (error) {
+            return res.status(400).json({ status: 'error', message: error.message });
+        }
+    }
 }
 
 module.exports = new PostController();

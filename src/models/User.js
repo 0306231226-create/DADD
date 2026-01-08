@@ -8,21 +8,42 @@ module.exports = (sequelize, DataTypes) => {
         gender: { type: DataTypes.STRING },
         phone: { type: DataTypes.STRING },
         birthday: { type: DataTypes.DATEONLY },
-        status: { type: DataTypes.STRING, defaultValue: 'active' }
+        status: { type: DataTypes.STRING, defaultValue: 'active' },
+        interests: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            get() {
+                const rawValue = this.getDataValue('interests');
+                if (!rawValue) return [];
+                try {
+                    return JSON.parse(rawValue);
+                } catch (e) {
+                    return [];
+                }
+            },
+            set(value) {
+                this.setDataValue('interests', JSON.stringify(value));
+            }
+        }
     }, {
         tableName: 'users',
         timestamps: false
     });
 
     User.associate = (models) => {
-        // Quan trọng: Kiểm tra xem models.Post có tồn tại không
+        // Kiểm tra xem các model liên quan đã được load chưa
         if (models.Post) {
             User.hasMany(models.Post, { foreignKey: 'users_id', as: 'posts' });
         }
         if (models.Login) {
-            User.hasOne(models.Login, { foreignKey: 'users_id', as: 'logins' });
+            // Lưu ý: Thông thường User -> Login là 1:1, kiểm tra lại logic nếu cần
+            User.hasOne(models.Login, { foreignKey: 'users_id', as: 'loginInfo' });
         }
     };
-
+    // src/models/User.js
+User.associate = (models) => {
+    // Các quan hệ khác (Post, Vote...)
+    User.hasMany(models.Comment, { foreignKey: 'users_id', as: 'comments' });
+};
     return User;
 };

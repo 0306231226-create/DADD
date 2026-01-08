@@ -1,20 +1,24 @@
 const fs = require('fs');
 const path = require('path');
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize'); // Khai báo LẦN 1 (để lấy Class)
 const basename = path.basename(__filename);
+require('dotenv').config();
+
 const db = {};
 
+// Khởi tạo instance kết nối
 const sequelize = new Sequelize(
-    process.env.DB_NAME, 
-    process.env.DB_USER, 
-    process.env.DB_PASS, 
+    process.env.DB_NAME || 'dadđ', 
+    process.env.DB_USER || 'root', 
+    process.env.DB_PASS || '', 
     {
-        host: process.env.DB_HOST,
+        host: process.env.DB_HOST || 'localhost',
         dialect: 'mysql',
         logging: false
     }
 );
 
+// Tự động nạp các file models trong thư mục này
 fs.readdirSync(__dirname)
     .filter(file => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
@@ -23,20 +27,18 @@ fs.readdirSync(__dirname)
         try {
             const modelExport = require(path.join(__dirname, file));
             
-            // CHỈ NẠP NẾU FILE LÀ MỘT FUNCTION
             if (typeof modelExport === 'function') {
                 const model = modelExport(sequelize, Sequelize.DataTypes);
-                
-                // Chỉ thêm vào danh sách DB nếu model có tên (tránh file rỗng trả về {})
                 if (model && model.name) {
                     db[model.name] = model;
                 }
             }
         } catch (error) {
-            console.error(`❌ Lỗi khi nạp file model: ${file}. Hãy kiểm tra xem file có trống không.`);
+            console.error(`❌ Lỗi khi nạp file model: ${file}`);
         }
     });
 
+// Thiết lập quan hệ (associations) giữa các bảng
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
         db[modelName].associate(db);
@@ -46,9 +48,5 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-// Thêm dòng này để kiểm tra trong console
-sequelize.authenticate()
-    .then(() => console.log('🚀 Database kết nối thành công!'))
-    .catch(err => console.error('Unable to connect to the database:', err));
-
+// Xuất đối tượng db để các nơi khác sử dụng
 module.exports = db;

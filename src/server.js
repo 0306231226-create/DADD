@@ -1,12 +1,14 @@
-require('dotenv').config(); // DÒNG NÀY PHẢI Ở TRÊN CÙNG
+require('dotenv').config(); 
 const app = require('./app');
-const { sequelize } = require('./models');
+const { sequelize } = require('./models'); // Lấy sequelize đã cấu hình từ models
 
 const PORT = process.env.PORT || 3000;
 
 sequelize.authenticate()
     .then(() => {
-        console.log('Database connected...');
-        app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        console.log('✅ Database connected thành công!');
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
     })
-    .catch(err => console.log('Error: ' + err));
+    .catch(err => {
+        console.error('❌ Không thể kết nối Database:', err);
+    });

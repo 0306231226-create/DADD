@@ -1,14 +1,8 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
+const voteController = require('./vote.controller');
+const authMiddleware = require('../../middlewares/auth.middleware');
 
-// Vote bài viết
-router.post('/', (req, res) => {
-  res.json({ message: 'Vote post' })
-})
-
-// Hủy vote
-router.delete('/:postId', (req, res) => {
-  res.json({ message: 'Unvote post' })
-})
-
-module.exports = router
+router.post('/posts/:postId/vote', authMiddleware, voteController.votePost);
+router.delete('/posts/:postId/vote', authMiddleware, voteController.deleteVote);
+module.exports = router;
