@@ -39,6 +39,32 @@ async create(data) {
         const downvotes = await db.Vote.count({ where: { post_id: postId, vote_type: -1 } });
         return upvotes - downvotes;
     }
+    async getDetailedStats(postId) {
+        // Đếm số lượng upvote (giá trị 1)
+        const upvotes = await db.Vote.count({
+            where: { 
+                posts_id: postId, // Nếu DB báo lỗi Unknown column thì đổi thành post_id
+                vote_type: 1 
+            }
+        });
+
+        // Đếm số lượng downvote (giá trị -1)
+        const downvotes = await db.Vote.count({
+            where: { 
+                posts_id: postId, 
+                vote_type: -1 
+            }
+        });
+
+        return { upvotes, downvotes };
+    }
+
+    async countTotalScore(postId) {
+        const result = await db.Vote.sum('vote_type', {
+            where: { posts_id: postId }
+        });
+        return result || 0;
+    }
 }
 
 module.exports = new VoteRepository();

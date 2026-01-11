@@ -37,6 +37,17 @@ class VoteService {
         await voteRepository.delete(userId, postId);
         return await voteRepository.countTotalScore(postId);
     }
+// Trong VoteService.js
+async getVoteStats(postId) {
+    // Gọi đúng tên hàm vừa tạo ở Repository
+    const stats = await voteRepository.getDetailedStats(postId);
+    
+    return {
+        upvotes: stats.upvotes,
+        downvotes: stats.downvotes,
+        totalScore: stats.upvotes - stats.downvotes
+    };
+}
 }
 
 module.exports = new VoteService();
