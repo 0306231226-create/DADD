@@ -21,7 +21,7 @@ class PostService {
         users_id: userId,
         title: postData.title, // <--- THÊM DÒNG NÀY
         content: postData.content,
-        imageurl: postData.imageurl || null,
+        image_url: postData.image_url || null,
         status: 'public'
     };
     
@@ -44,7 +44,7 @@ async updatePost(postId, userId, updateData) {
     const updatedPost = await postRepository.update(postId, {
         title: updateData.title || post.title,
         content: updateData.content || post.content,
-        imageurl: updateData.imageurl || post.imageurl,
+        image_url: updateData.image_url || post.image_url,
         // Nếu bạn có dùng tags (lưu trong cột interests hoặc bảng riêng) thì thêm ở đây
     });
 

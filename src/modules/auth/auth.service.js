@@ -5,7 +5,7 @@ const transporter = require('../../services/mail.service');
 const { sequelize } = require('../../models');
 
 class AuthService {
-   
+
     async register({ username, email, password }) {
         const transaction = await sequelize.transaction();
         try {
@@ -30,7 +30,57 @@ class AuthService {
         }
     }
 
-   
+   async refreshToken(token) {
+    try {
+        if (!token) {
+            throw new Error('Không tìm thấy token');
+        }
+        let cleanToken = token;
+        if (typeof token === 'string') {
+            if (token.includes('refreshToken=')) {
+                cleanToken = token.split('refreshToken=')[1].split(';')[0];
+            }
+            cleanToken = cleanToken.trim();
+        }
+        
+        if (!process.env.JWT_REFRESH_SECRET) {
+            throw new Error('Server chưa cấu hình mã bí mật REFRESH_SECRET');
+        }
+
+        const decoded = jwt.verify(cleanToken, process.env.JWT_REFRESH_SECRET);
+        const user = await authRepository.findLoginByUserId(decoded.id);
+        if (!user) {
+            throw new Error('Người dùng không tồn tại hoặc đã bị khóa');
+        }
+
+        const payload = { 
+            id: user.id, 
+            role: user.role 
+        };
+        
+        const newAccessToken = jwt.sign(
+            payload, 
+            process.env.JWT_ACCESS_SECRET, 
+            { expiresIn: '1h' }
+        );
+
+        return newAccessToken;
+
+    } catch (error) {
+        console.error("❌ Lỗi Refresh Token:", error.message);
+
+        if (error.name === 'TokenExpiredError') {
+            throw new Error('Phiên làm việc đã hết hạn, vui lòng đăng nhập lại');
+        }
+        
+        if (error.name === 'JsonWebTokenError') {
+            throw new Error('Mã xác thực không hợp lệ hoặc đã bị chỉnh sửa');
+        }
+
+        throw error;
+    }
+}
+
     async login({ email, password }) {
         const user = await authRepository.findUserByEmail(email);
         if (!user) throw new Error('Email hoặc mật khẩu không đúng');
@@ -40,28 +90,28 @@ class AuthService {
         if (!isMatch) throw new Error('Email hoặc mật khẩu không đúng');
 
         const payload = { id: user.id, role: user.role };
-        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '180d' });
-        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '1d' });
+        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '8h' });
 
         return { user, accessToken, refreshToken };
     }
 
-   
+
     async forgotPassword(email) {
         const user = await authRepository.findUserByEmail(email);
         if (!user) throw new Error('Email không tồn tại trong hệ thống');
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
-       
+
+
         const resetToken = jwt.sign(
-            { email, otp }, 
-            process.env.JWT_ACCESS_SECRET, 
+            { email, otp },
+            process.env.JWT_ACCESS_SECRET,
             { expiresIn: '2m' }
         );
 
         await transporter.sendMail({
-            from: '"Hệ thống MXH" <no-reply@socialapp.com>',
+            from: '"Hệ thống MXH" <admin@socialapp.com>',
             to: email,
             subject: 'Mã xác thực đổi mật khẩu',
             html: `
@@ -75,9 +125,9 @@ class AuthService {
         return { resetToken };
     }
 
-   
+
     async resetPassword(otp, newPassword, resetToken) {
-        try {         
+        try {
             const decoded = jwt.verify(resetToken, process.env.JWT_ACCESS_SECRET);
             if (String(decoded.otp) !== String(otp)) {
                 throw new Error('Mã OTP không chính xác');

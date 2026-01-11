@@ -22,7 +22,7 @@ class VoteRepository {
         const downvotes = await Vote.count({ where: { posts_id, vote_type: 'downvote' } });
         return upvotes - downvotes;
     }
-    // src/modules/votes/vote.repository.js
+    
 
 async deleteVote(users_id, posts_id) {
     return await Vote.destroy({ 

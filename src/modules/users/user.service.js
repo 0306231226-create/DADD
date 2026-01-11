@@ -8,7 +8,7 @@ class UserService {
     }
 
     async updateProfile(userId, updateData) {
-        // Chỉ cho phép cập nhật các trường có trong DB của bạn (trừ id, email, role)
+        
         const allowedUpdates = [
             'username', 
             'avatarurl', 
@@ -27,16 +27,6 @@ class UserService {
         await userRepository.update(userId, filteredData);
         return await userRepository.findById(userId);
     }
-    async updateInterests(userId, interests) {
-    const user = await userRepository.findById(userId);
-    if (!user) throw new Error('User không tồn tại');
-
-    // Lưu mảng sở thích vào user
-    user.interests = interests; 
-    await user.save();
-    
-    return true;
-}
 }
 
 module.exports = new UserService();

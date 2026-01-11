@@ -10,7 +10,6 @@ module.exports = (req, res, next) => {
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         
-        // Gán thông tin user vào request để dùng ở các hàm sau
         req.user = decoded; 
         next();
     } catch (error) {
