@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         tableName: 'notifications',
         timestamps: true,
         createdAt: 'created_at',
-        updatedAt: false // Vì bảng của bạn không có cột updated_at
+        updatedAt: false
     });
 
     return Notification;

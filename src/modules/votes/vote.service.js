@@ -1,33 +1,42 @@
 const voteRepository = require('./vote.repository');
+const db = require('../../models');
+
+const VOTE_MAP = {
+    upvote: 1,
+    downvote: -1
+};
 
 class VoteService {
     async toggleVote(userId, postId, type) {
+        const voteValue = VOTE_MAP[type];
+        
+        // 1. Tìm vote đã tồn tại
         const existingVote = await voteRepository.findVote(userId, postId);
 
         if (existingVote) {
-            if (existingVote.vote_type === type) {
-                // Người dùng bấm lại cùng một nút -> Hủy vote
+            if (existingVote.vote_type === voteValue) {
+                // Bấm lại cùng nút -> Hủy vote
                 await voteRepository.delete(userId, postId);
             } else {
-                // Người dùng đổi từ Up sang Down hoặc ngược lại
-                await voteRepository.update(userId, postId, type);
+                // Đổi từ Up sang Down hoặc ngược lại
+                await voteRepository.update(userId, postId, voteValue);
             }
         } else {
-            // Chưa từng vote bài này -> Tạo mới
-            await voteRepository.create({ users_id: userId, posts_id: postId, vote_type: type });
+            // 2. Tạo vote mới - Chú ý tên trường phải khớp với Repository
+            await voteRepository.create({
+                users_id: userId,
+                post_id: postId, // Đã sửa từ posts_id thành post_id
+                vote_type: voteValue
+            });
         }
 
         return await voteRepository.countTotalScore(postId);
     }
-    // src/modules/votes/vote.service.js
 
-async cancelVote(userId, postId) {
-    // 1. Thực hiện xóa vote
-    await voteRepository.deleteVote(userId, postId);
-
-    // 2. Tính toán lại tổng điểm vote mới nhất của bài viết
-    return await voteRepository.countTotalScore(postId);
-}
+    async cancelVote(userId, postId) {
+        await voteRepository.delete(userId, postId);
+        return await voteRepository.countTotalScore(postId);
+    }
 }
 
 module.exports = new VoteService();

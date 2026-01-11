@@ -1,25 +1,23 @@
 module.exports = (sequelize, DataTypes) => {
-    const Vote = sequelize.define('Vote', { // <--- Tên model phải là 'Vote'
-        id: {
+    const Vote = sequelize.define('Vote', {
+        user_id: {
             type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
+            field: 'users_id', // Khớp với ảnh của bạn
+            primaryKey: true
         },
-        users_id: {
+        post_id: {
             type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        posts_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false
+            field: 'posts_id', // Khớp với ảnh của bạn
+            primaryKey: true
         },
         vote_type: {
-            type: DataTypes.ENUM('upvote', 'downvote'),
-            allowNull: false
+            type: DataTypes.INTEGER,
+            field: 'votetype' // Kiểm tra kỹ lại ảnh, nếu cột là 'votetype' thì dùng tên này
         }
     }, {
         tableName: 'votes',
-        timestamps: false
+        // QUAN TRỌNG: Tắt timestamps vì bảng không có cột createdAt/updatedAt
+        timestamps: false 
     });
 
     return Vote;

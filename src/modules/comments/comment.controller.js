@@ -82,6 +82,20 @@ class CommentController {
             });
         }
     }
+    async getOneComment(req, res) {
+    try {
+        const { commentId } = req.params;
+        const comment = await commentService.getCommentById(commentId);
+        
+        if (!comment) {
+            return res.status(404).json({ message: 'Không tìm thấy bình luận' });
+        }
+
+        return res.status(200).json(comment);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
 }
 
 module.exports = new CommentController();
