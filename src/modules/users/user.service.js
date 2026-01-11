@@ -4,14 +4,15 @@ class UserService {
     // Lấy Profile kèm mảng các Tag sở thích
     async getProfile(userId) {
         const user = await db.User.findByPk(userId, {
-            attributes: { exclude: ['password'] }, // Không trả về mật khẩu
+            attributes: { exclude: ['password'] },
             include: [{
                 model: db.Tag,
-                as: 'userTags', // Tên alias phải khớp với định nghĩa trong models/index.js
+                as: 'userTags',
                 attributes: ['id', 'tags_name'],
-                through: { attributes: [] } // Không lấy dữ liệu từ bảng trung gian
+                through: { attributes: [] }
             }]
         });
+
         if (!user) throw new Error('Người dùng không tồn tại');
         return user;
     }
@@ -20,19 +21,34 @@ class UserService {
     async updateProfile(userId, updateData) {
         const user = await db.User.findByPk(userId);
         if (!user) throw new Error('Người dùng không tồn tại');
-        
-        return await user.update(updateData);
+
+        // Chỉ cho phép update các field an toàn
+        const allowedUpdates = [
+            'username',
+            'avatarurl',
+            'gender',
+            'phone',
+            'birthday'
+        ];
+
+        const filteredData = {};
+        for (const key of allowedUpdates) {
+            if (updateData[key] !== undefined) {
+                filteredData[key] = updateData[key];
+            }
+        }
+
+        return await user.update(filteredData);
     }
 
-    // Cập nhật sở thích vào bảng trung gian user_interests
+    // Cập nhật sở thích (bảng user_interests)
     async updateInterests(userId, tagIds) {
         const user = await db.User.findByPk(userId);
         if (!user) throw new Error('Người dùng không tồn tại');
 
-        // Sequelize sẽ tự xóa các tag cũ và thêm tag mới vào bảng user_interests
-        // Hàm setUserTags được tạo tự động từ liên kết belongsToMany
+        // Sequelize tự động sync bảng trung gian
         await user.setUserTags(tagIds);
-        
+
         return true;
     }
 }

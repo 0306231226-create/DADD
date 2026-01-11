@@ -15,9 +15,10 @@ app.use(cookieParser());
 const authRoutes = require('./modules/auth/auth.routes');
 const userRoutes = require('./modules/users/user.routes');
 const postRoutes = require('./modules/posts/post.routes');
-const voteRoutes = require('./modules/votes/vote.routes'); // Chỉ khai báo 1 lần
+const voteRoutes = require('./modules/votes/vote.routes');
 const commentRoutes = require('./modules/comments/comment.routes');
 const notificationRoutes = require('./modules/notifications/notification.routes');
+const followRoutes = require('./modules/follows/follow.routes');
 
 // --- ĐĂNG KÝ ROUTES ---
 
@@ -25,14 +26,18 @@ const notificationRoutes = require('./modules/notifications/notification.routes'
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
-// Posts & liên quan (Vote, Comment)
-app.use('/api/posts', postRoutes);    // Cho các route như /api/posts
-app.use('/api/posts', voteRoutes);    // Cho các route như /api/posts/:postId/vote
-app.use('/api/posts', commentRoutes); // Cho các route như /api/posts/:postId/comments
+// Posts & liên quan
+app.use('/api/posts', postRoutes);      // /api/posts
+app.use('/api/posts', voteRoutes);      // /api/posts/:postId/vote
+app.use('/api/posts', commentRoutes);   // /api/posts/:postId/comments
 
-// Khác
+// Follow
+app.use('/api/follows', followRoutes);
+
+// Notifications
 app.use('/api/notifications', notificationRoutes);
 
+// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK' });
 });

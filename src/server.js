@@ -1,7 +1,6 @@
 require('dotenv').config(); 
 const app = require('./app');
-const { sequelize } = require('./models'); // Lấy sequelize đã cấu hình từ models
-
+const { sequelize } = require('./models'); 
 const PORT = process.env.PORT || 3000;
 
 sequelize.authenticate()

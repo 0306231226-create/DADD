@@ -16,18 +16,17 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     User.associate = (models) => {
-        // Kiểm tra xem các model liên quan đã được load chưa
         if (models.Post) {
             User.hasMany(models.Post, { foreignKey: 'users_id', as: 'posts' });
         }
         if (models.Login) {
-            // Lưu ý: Thông thường User -> Login là 1:1, kiểm tra lại logic nếu cần
+            
             User.hasOne(models.Login, { foreignKey: 'users_id', as: 'loginInfo' });
         }
     };
-    // src/models/User.js
+    
 User.associate = (models) => {
-    // Các quan hệ khác (Post, Vote...)
+
     User.hasMany(models.Comment, { foreignKey: 'users_id', as: 'comments' });
 };
     return User;
