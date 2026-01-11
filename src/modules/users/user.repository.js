@@ -3,7 +3,6 @@ const { User } = require('../../models');
 class UserRepository {
     async findById(id) {
         return await User.findByPk(id, {
-            // Loại bỏ các trường nhạy cảm nếu cần
             attributes: { exclude: ['password_hash'] } 
         });
     }

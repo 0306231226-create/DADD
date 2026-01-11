@@ -33,6 +33,12 @@ class PostRepository {
 
     // 3. Lấy bài viết cho Newsfeed (Có phân trang và lọc theo sở thích)
     async findAllForNewsfeed({ limit, offset, interests = [], sortBy = 'id', order = 'DESC' }) {
+        /*
+        limit → số bài mỗi trang
+        offset → bỏ qua bao nhiêu bài
+        interests = [] → danh sách sở thích (tag, keyword)
+        sortBy = 'id' → cột sắp xếp
+        order = 'DESC' → thứ tự sắp xếp*/
         let whereCondition = { status: 'public' };
 
         if (interests.length > 0) {

@@ -1,12 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const Sequelize = require('sequelize'); // Khai báo LẦN 1 (để lấy Class)
+const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 require('dotenv').config();
 
 const db = {};
 
-// Khởi tạo instance kết nối
 const sequelize = new Sequelize(
     process.env.DB_NAME || 'dadđ', 
     process.env.DB_USER || 'root', 
@@ -18,7 +17,7 @@ const sequelize = new Sequelize(
     }
 );
 
-// Tự động nạp các file models trong thư mục này
+// 1. Tự động nạp các file models
 fs.readdirSync(__dirname)
     .filter(file => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
@@ -26,7 +25,6 @@ fs.readdirSync(__dirname)
     .forEach(file => {
         try {
             const modelExport = require(path.join(__dirname, file));
-            
             if (typeof modelExport === 'function') {
                 const model = modelExport(sequelize, Sequelize.DataTypes);
                 if (model && model.name) {
@@ -34,11 +32,26 @@ fs.readdirSync(__dirname)
                 }
             }
         } catch (error) {
-            console.error(`❌ Lỗi khi nạp file model: ${file}`);
+            console.error(`❌ Lỗi khi nạp file model: ${file}`, error);
         }
     });
 
-// Thiết lập quan hệ (associations) giữa các bảng
+// 2. KHÔNG VIẾT QUAN HỆ RỜI RẠC Ở ĐÂY. 
+// Nếu bạn muốn viết quan hệ trực tiếp trong file này, phải dùng db.User và db.Tag:
+if (db.User && db.Tag && db.UserInterest) {
+    db.User.belongsToMany(db.Tag, { 
+        through: db.UserInterest, 
+        foreignKey: 'users_id', 
+        as: 'userTags' 
+    });
+
+    db.Tag.belongsToMany(db.User, { 
+        through: db.UserInterest, 
+        foreignKey: 'tag_id' 
+    });
+}
+
+// 3. Tự động gọi hàm associate bên trong từng file model (Khuyên dùng)
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
         db[modelName].associate(db);
@@ -48,5 +61,4 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-// Xuất đối tượng db để các nơi khác sử dụng
 module.exports = db;

@@ -1,39 +1,38 @@
-require('dotenv').config(); // 1. Load cấu hình môi trường đầu tiên
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
-// 2. Khởi tạo app (Phải đặt trước khi sử dụng app.use)
 const app = express();
 
-// 3. Cài đặt các Middleware cơ bản
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// 4. Import các Routes
+// --- IMPORT ROUTES ---
 const authRoutes = require('./modules/auth/auth.routes');
 const userRoutes = require('./modules/users/user.routes');
 const postRoutes = require('./modules/posts/post.routes');
-const voteRoutes = require('./modules/votes/vote.routes');
+const voteRoutes = require('./modules/votes/vote.routes'); // Chỉ khai báo 1 lần
 const commentRoutes = require('./modules/comments/comment.routes');
 const notificationRoutes = require('./modules/notifications/notification.routes');
 
-app.use('/api/notifications', notificationRoutes);
-app.use('/api', commentRoutes);
+// --- ĐĂNG KÝ ROUTES ---
+
+// Auth & User
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
-// Gộp các route liên quan đến bài viết vào đây
-app.use('/api/posts', postRoutes);    // Quản lý bài viết
-app.use('/api/posts', commentRoutes); // Quản lý bình luận (vì route là /posts/:postId/comments)
+// Posts & liên quan (Vote, Comment)
+app.use('/api/posts', postRoutes);    // Cho các route như /api/posts
+app.use('/api/posts', voteRoutes);    // Cho các route như /api/posts/:postId/vote
+app.use('/api/posts', commentRoutes); // Cho các route như /api/posts/:postId/comments
 
-// Đối với Vote, nếu file vote.routes.js của bạn đã có prefix /posts trong đó
-// thì dùng app.use('/api', voteRoutes)
-app.use('/api', voteRoutes); 
+// Khác
+app.use('/api/notifications', notificationRoutes);
 
-// 6. Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK' });
 });

@@ -19,6 +19,23 @@ class PostController {
         return res.status(500).json({ status: 'error', message: error.message });
     }
 }
+// src/modules/users/user.controller.js
+async getProfile(req, res) {
+    try {
+        const user = await db.User.findByPk(req.user.id, {
+            include: [{
+                model: db.Tag,
+                as: 'userTags',
+                attributes: ['id', 'tags_name'], // Chỉ lấy id và tên tag
+                through: { attributes: [] } // Bỏ qua các cột của bảng trung gian
+            }]
+        });
+
+        return res.json({ status: 'success', data: user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
 
     // API Đăng bài viết
     async createPost(req, res) {
@@ -60,7 +77,6 @@ async updatePost(req, res) {
             data: result
         });
     } catch (error) {
-        // Trả về lỗi 403 nếu không có quyền, 404 nếu không thấy bài
         const statusCode = error.message.includes('quyền') ? 403 : 404;
         return res.status(statusCode).json({ 
             status: 'error', 

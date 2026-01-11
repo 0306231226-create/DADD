@@ -9,22 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         phone: { type: DataTypes.STRING },
         birthday: { type: DataTypes.DATEONLY },
         status: { type: DataTypes.STRING, defaultValue: 'active' },
-        interests: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-            get() {
-                const rawValue = this.getDataValue('interests');
-                if (!rawValue) return [];
-                try {
-                    return JSON.parse(rawValue);
-                } catch (e) {
-                    return [];
-                }
-            },
-            set(value) {
-                this.setDataValue('interests', JSON.stringify(value));
-            }
-        }
+        
     }, {
         tableName: 'users',
         timestamps: false
