@@ -9,25 +9,23 @@ const VOTE_MAP = {
 class VoteService {
     async toggleVote(userId, postId, type) {
         const voteValue = VOTE_MAP[type];
-        if (!voteValue) {
-            throw new Error('Invalid vote type');
-        }
-
+        
+        // 1. Tìm vote đã tồn tại
         const existingVote = await voteRepository.findVote(userId, postId);
 
         if (existingVote) {
             if (existingVote.vote_type === voteValue) {
-                // Bấm lại cùng nút → hủy vote
+                // Bấm lại cùng nút -> Hủy vote
                 await voteRepository.delete(userId, postId);
             } else {
-                // Đổi up ↔ down
+                // Đổi từ Up sang Down hoặc ngược lại
                 await voteRepository.update(userId, postId, voteValue);
             }
         } else {
-            // Tạo vote mới
+            // 2. Tạo vote mới - Chú ý tên trường phải khớp với Repository
             await voteRepository.create({
                 users_id: userId,
-                posts_id: postId,
+                post_id: postId, // Đã sửa từ posts_id thành post_id
                 vote_type: voteValue
             });
         }
@@ -36,30 +34,8 @@ class VoteService {
     }
 
     async cancelVote(userId, postId) {
-        await voteRepository.deleteVote(userId, postId);
+        await voteRepository.delete(userId, postId);
         return await voteRepository.countTotalScore(postId);
-    }
-
-    async getVoteStats(postId, userId) {
-        const upvotes = await db.Vote.count({
-            where: { post_id: postId, vote_type: 1 }
-        });
-
-        const downvotes = await db.Vote.count({
-            where: { post_id: postId, vote_type: -1 }
-        });
-
-        const userVote = await db.Vote.findOne({
-            where: { post_id: postId, user_id: userId }
-        });
-
-        return {
-            postId,
-            upvotes,
-            downvotes,
-            totalScore: upvotes - downvotes,
-            currentUserVote: userVote ? userVote.vote_type : 0
-        };
     }
 }
 

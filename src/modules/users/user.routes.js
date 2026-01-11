@@ -12,6 +12,5 @@ router.get('/me', authMiddleware, userController.getProfile);
 router.put('/update', authMiddleware, userController.updateProfile);
 
 // Cập nhật sở thích của user hiện tại
-router.put('/me/interests', authMiddleware, userController.updateMyInterests);
-
+router.put('/me/interests', authMiddleware, userController.updateInterests);
 module.exports = router;

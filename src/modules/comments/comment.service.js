@@ -1,4 +1,5 @@
 const commentRepository = require('./comment.repository');
+const db = require('../../models');
 
 class CommentService {
     async getCommentsByPost(postId) {
@@ -69,6 +70,10 @@ class CommentService {
 
         return await commentRepository.softDelete(commentId);
     }
+    async getCommentById(commentId) {
+    // Chỉ lấy dữ liệu bảng Comment, không lôi bảng User vào
+    return await db.Comment.findByPk(commentId); 
+};
 }
 
 module.exports = new CommentService();

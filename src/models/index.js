@@ -38,19 +38,40 @@ fs.readdirSync(__dirname)
 
 // 2. KHÔNG VIẾT QUAN HỆ RỜI RẠC Ở ĐÂY. 
 // Nếu bạn muốn viết quan hệ trực tiếp trong file này, phải dùng db.User và db.Tag:
+// models/index.js
+// models/index.js
+// models/index.js - Phần thiết lập quan hệ
 if (db.User && db.Tag && db.UserInterest) {
     db.User.belongsToMany(db.Tag, { 
         through: db.UserInterest, 
         foreignKey: 'users_id', 
+        otherKey: 'tag_id',
         as: 'userTags' 
     });
 
     db.Tag.belongsToMany(db.User, { 
         through: db.UserInterest, 
-        foreignKey: 'tag_id' 
+        foreignKey: 'tag_id',
+        otherKey: 'users_id',
+        as: 'users'
+    });
+} else {
+    console.error("❌ Không thể thiết lập quan hệ: Một trong các Model (User, Tag, UserInterest) bị thiếu.");
+}
+if (db.Post && db.Tag && db.PostTag) {
+    db.Post.belongsToMany(db.Tag, { 
+        through: db.PostTag, 
+        foreignKey: 'post_id', 
+        otherKey: 'tag_id',
+        as: 'tags' 
+    });
+
+    db.Tag.belongsToMany(db.Post, { 
+        through: db.PostTag, 
+        foreignKey: 'tag_id',
+        otherKey: 'post_id'
     });
 }
-
 // 3. Tự động gọi hàm associate bên trong từng file model (Khuyên dùng)
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {

@@ -1,34 +1,44 @@
-const { Vote } = require('../../models');
+const db = require('../../models');
 
 class VoteRepository {
-    async findVote(users_id, posts_id) {
-        return await Vote.findOne({ where: { users_id, posts_id } });
+    async findVote(userId, postId) {
+        return await db.Vote.findOne({
+            where: { 
+                user_id: userId, 
+                post_id: postId 
+            }
+        });
     }
 
-    async create(data) {
-        return await Vote.create(data);
-    }
-
-    async delete(users_id, posts_id) {
-        return await Vote.destroy({ where: { users_id, posts_id } });
-    }
-
-    async update(users_id, posts_id, vote_type) {
-        return await Vote.update({ vote_type }, { where: { users_id, posts_id } });
-    }
-
-    async countTotalScore(posts_id) {
-        const upvotes = await Vote.count({ where: { posts_id, vote_type: 'upvote' } });
-        const downvotes = await Vote.count({ where: { posts_id, vote_type: 'downvote' } });
-        return upvotes - downvotes;
-    }
-    
-
-async deleteVote(users_id, posts_id) {
-    return await Vote.destroy({ 
-        where: { users_id, posts_id } 
+    // src/modules/votes/vote.repository.js
+// Bản Repository rút gọn chuẩn cho Model của bạn
+async create(data) {
+    return await db.Vote.create({
+        user_id: data.users_id,
+        post_id: data.post_id,
+        vote_type: data.vote_type
     });
 }
+
+    async update(userId, postId, voteValue) {
+        return await db.Vote.update(
+            { vote_type: voteValue },
+            { where: { user_id: userId, post_id: postId } }
+        );
+    }
+
+    async delete(userId, postId) {
+        return await db.Vote.destroy({
+            where: { user_id: userId, post_id: postId },
+            force: true // Xóa hẳn bản ghi
+        });
+    }
+
+    async countTotalScore(postId) {
+        const upvotes = await db.Vote.count({ where: { post_id: postId, vote_type: 1 } });
+        const downvotes = await db.Vote.count({ where: { post_id: postId, vote_type: -1 } });
+        return upvotes - downvotes;
+    }
 }
 
 module.exports = new VoteRepository();

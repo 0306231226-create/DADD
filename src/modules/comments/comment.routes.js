@@ -1,31 +1,26 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
 const authMiddleware = require('../../middlewares/auth.middleware');
 const commentController = require('./comment.controller');
 
-// GET /api/posts/1/comments
+// --- NHÓM 1: Đi kèm với tiền tố /api/posts ---
+
+// GET /api/posts/:postId/comments
 router.get('/:postId/comments', commentController.getComments); 
+
+// POST /api/posts/:postId/comments
 router.post('/:postId/comments', authMiddleware, commentController.createComment);
-router.post('/comments/:commentId/reply', authMiddleware, commentController.replyComment);
-router.delete('/comments/:commentId', authMiddleware, commentController.deleteComment);
-// Lấy danh sách comment
-router.get('/post/:postId', (req, res) => {
-  res.json({ message: 'Get comments' })
-})
 
-// Comment bài viết
-router.post('/', (req, res) => {
-  res.json({ message: 'Create comment' })
-})
 
-// Trả lời comment
-router.post('/:commentId/reply', (req, res) => {
-  res.json({ message: 'Reply comment' })
-})
+// --- NHÓM 2: Đi kèm với tiền tố /api/comments ---
 
-// Xóa comment
-router.delete('/:commentId', (req, res) => {
-  res.json({ message: 'Delete comment' })
-})
+// DELETE /api/comments/:commentId
+router.delete('/:commentId', authMiddleware, commentController.deleteComment);
 
-module.exports = router
+// POST /api/comments/:commentId/reply
+router.post('/:commentId/reply', authMiddleware, commentController.replyComment);
+
+// GET /api/comments/:commentId (Lấy 1 comment cụ thể như bạn muốn lúc nãy)
+router.get('/:commentId', commentController.getOneComment);
+
+module.exports = router;
