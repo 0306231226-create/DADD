@@ -94,20 +94,12 @@ app.get('/health', (req, res) => {
 app.use((req, res) => {
     res.status(404).json({
         status: 'error',
-        message: `Đường dẫn ${req.originalUrl} không tồn there trên server.`
+        message: `Đường dẫn ${req.originalUrl} không tồn tại trên server.`
     });
 });
 
-// ==========================================
+
 // 5. KHỞI CHẠY SERVER
-// ==========================================
-// const PORT = process.env.PORT || 3000;
-// app.listen(PORT, () => {
-//     console.log('-----------------------------------------');
-//     console.log(`🚀 Server đang chạy tại: http://localhost:${PORT}`);
-//     console.log(`✅ Route Báo cáo: /api/posts/:id/comments`);
-//     console.log(`✅ Route Ưa thích: /api/comments/:id`);
-//     console.log('-----------------------------------------');
-// });
+
 
 module.exports = app;

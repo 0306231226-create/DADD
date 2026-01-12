@@ -2,11 +2,11 @@ const postService = require('./post.service');
 const db = require('../../models');
 
 class PostController {
-    // API Lấy danh sách bài viết của chính người đang đăng nhập
+    
    async getPostsByUser(req, res) {
     try {
         const { userId } = req.params;
-        // Mặc định mỗi lần cuộn lấy 10 bài
+       
         const page = req.query.page || 1;
         const limit = req.query.limit || 10;
         
@@ -20,15 +20,15 @@ class PostController {
         return res.status(500).json({ status: 'error', message: error.message });
     }
 }
-// src/modules/users/user.controller.js
+
 async getProfile(req, res) {
     try {
         const user = await db.User.findByPk(req.user.id, {
             include: [{
                 model: db.Tag,
                 as: 'userTags',
-                attributes: ['id', 'tags_name'], // Chỉ lấy id và tên tag
-                through: { attributes: [] } // Bỏ qua các cột của bảng trung gian
+                attributes: ['id', 'tags_name'], 
+                through: { attributes: [] } 
             }]
         });
 
@@ -38,7 +38,7 @@ async getProfile(req, res) {
     }
 }
 
-    // API Đăng bài viết
+    
     async createPost(req, res) {
         try {
             const userId = req.user.id;
@@ -53,7 +53,7 @@ async getProfile(req, res) {
     }
     async getNewsfeed(req, res) {
     try {
-        // req.user có thể undefined nếu không yêu cầu token bắt buộc
+        
         const data = await postService.getNewsfeed(req.user, req.query);
         
         return res.json({
@@ -66,12 +66,12 @@ async getProfile(req, res) {
 }
 async updatePost(req, res) {
     try {
-        // SỬA Ở ĐÂY: Lấy đúng postId từ params
+      
         const { postId } = req.params; 
         const { title, content, tags } = req.body;
         const userId = req.user.id;
 
-        // Ép kiểu về Number để đảm bảo so sánh chính xác
+      
         const post = await db.Post.findOne({ 
             where: { 
                 id: Number(postId), 
@@ -86,10 +86,10 @@ async updatePost(req, res) {
             });
         }
         
-        // Cập nhật thông tin bài viết
+        
         await post.update({ title, content });
 
-        // Xử lý Tags (Phần này giữ nguyên như cũ)
+        
        if (tags && Array.isArray(tags)) {
     const tagObjects = await db.Tag.findAll({
         attributes: ['id', 'tags_name'],
@@ -97,12 +97,12 @@ async updatePost(req, res) {
     });
 
     if (tagObjects.length > 0) {
-        // 1. Xóa dùng đúng tên cột posts_id
+       
         await db.PostTag.destroy({ 
             where: { posts_id: postId } 
         });
 
-        // 2. Tạo data dùng đúng tên cột posts_id và tags_id
+        
         const postTagData = tagObjects.map(t => ({
             posts_id: postId,
             tags_id: t.id

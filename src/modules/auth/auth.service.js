@@ -86,6 +86,7 @@ class AuthService {
         if (!user) throw new Error('Email hoặc mật khẩu không đúng');
 
         const loginInfo = await authRepository.findLoginByUserId(user.id);
+
         const isMatch = await bcrypt.compare(password, loginInfo.password_hash);
         if (!isMatch) throw new Error('Email hoặc mật khẩu không đúng');
 
