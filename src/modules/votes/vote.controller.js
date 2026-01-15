@@ -1,10 +1,11 @@
 const voteService = require('./vote.service');
 
 class VoteController {
-    // 1. Lấy thống kê vote
+    // Lấy số lượng upvote/downvote của bài viết và xem mình đã vote chưa
     async getPostVotes(req, res) {
         try {
             const { postId } = req.params;
+            // Check ID từ token, nếu không login thì để null
             const userId = req.user ? (req.user.id || req.user.userId || req.user.users_id) : null; 
 
             const stats = await voteService.getVoteStats(postId, userId);
@@ -18,16 +19,15 @@ class VoteController {
         }
     }
 
-    // 2. Thực hiện Vote (Upvote/Downvote)
+    // Xử lý khi user bấm nút Upvote hoặc Downvote
     async votePost(req, res) {
         try {
             const { postId } = req.params;
-            const { type } = req.body;
+            const { type } = req.body; // type thường là 'up' hoặc 'down'
 
-            // Debug để kiểm tra token trong Terminal
+            // In ra xem token có lấy được đúng user đang đăng nhập không
             console.log("Nội dung Token giải mã:", req.user); 
 
-            // Lấy ID an toàn
             const userId = req.user.id || req.user.userId || req.user.users_id;
 
             if (!userId) {
@@ -37,9 +37,9 @@ class VoteController {
                 });
             }
 
+            // Gọi service xử lý logic đổi vote hoặc tạo vote mới
             const totalScore = await voteService.toggleVote(userId, postId, type);
             
-            // QUAN TRỌNG: Phải có lệnh return res ở đây để Postman nhận được phản hồi
             return res.json({
                 status: 'success',
                 data: { totalScore }
@@ -49,7 +49,7 @@ class VoteController {
         }
     }
 
-    // 3. Xóa Vote
+    // Hủy vote (nếu user bấm lại vào nút đã chọn để bỏ vote)
     async deleteVote(req, res) {
         try {
             const { postId } = req.params;

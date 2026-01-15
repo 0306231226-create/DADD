@@ -7,9 +7,9 @@ module.exports = (sequelize, DataTypes) => {
         },
         comment: { 
             type: DataTypes.TEXT,
-            allowNull: false, // Bắt buộc phải có nội dung
+            allowNull: false,
             validate: {
-                notEmpty: true // Không cho phép chuỗi rỗng
+                notEmpty: true 
             }
         },
         posts_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
        parent_id: { 
             type: DataTypes.INTEGER, 
             allowNull: true,
-            field: 'parent' // <--- "Nói" với Sequelize: Cột thực tế trong DB là 'parent'
+            field: 'parent'
         }
     }, {
         tableName: 'comments',
@@ -27,9 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         updatedAt: 'updated_at',
         deletedAt: 'delete_at'
     });
-// src/models/Comment.js
 Comment.associate = (models) => {
-    // Quan hệ này giúp Sequelize hiểu khi bạn dùng: include: [{ model: User, as: 'user' }]
     Comment.belongsTo(models.User, { 
         foreignKey: 'users_id', 
         as: 'user' 

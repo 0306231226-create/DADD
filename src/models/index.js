@@ -35,12 +35,7 @@ fs.readdirSync(__dirname)
             console.error(`❌ Lỗi khi nạp file model: ${file}`, error);
         }
     });
-
-// 2. KHÔNG VIẾT QUAN HỆ RỜI RẠC Ở ĐÂY. 
-// Nếu bạn muốn viết quan hệ trực tiếp trong file này, phải dùng db.User và db.Tag:
-// models/index.js
-// models/index.js
-// models/index.js - Phần thiết lập quan hệ
+//Phần thiết lập quan hệ
 if (db.User && db.Tag && db.UserInterest) {
     db.User.belongsToMany(db.Tag, { 
         through: db.UserInterest, 
@@ -56,7 +51,7 @@ if (db.User && db.Tag && db.UserInterest) {
         as: 'users'
     });
 } else {
-    console.error("❌ Không thể thiết lập quan hệ: Một trong các Model (User, Tag, UserInterest) bị thiếu.");
+    console.error("Không thể thiết lập quan hệ: Một trong các Model (User, Tag, UserInterest) bị thiếu.");
 }
 if (db.Post && db.Tag && db.PostTag) {
     db.Post.belongsToMany(db.Tag, { 
@@ -72,7 +67,7 @@ if (db.Post && db.Tag && db.PostTag) {
         otherKey: 'post_id'
     });
 }
-// 3. Tự động gọi hàm associate bên trong từng file model (Khuyên dùng)
+// 3. Tự động gọi hàm associate bên trong từng file model
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
         db[modelName].associate(db);

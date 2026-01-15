@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     const UserInterest = sequelize.define('UserInterest', {
         users_id: {
             type: DataTypes.INTEGER,
-            primaryKey: true, // Nếu bảng không có cột id riêng, hãy đặt primaryKey ở đây
+            primaryKey: true, 
         },
         tag_id: {
             type: DataTypes.INTEGER,

@@ -79,11 +79,7 @@ class UserService {
         if (!user) throw new Error('Người dùng không tồn tại');
         return user;
     }
-
-
-
-
-
+    
     // Cập nhật thông tin cơ bản
     async updateProfile(userId, updateData) {
         const user = await db.User.findByPk(userId);

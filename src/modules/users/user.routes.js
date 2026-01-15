@@ -14,6 +14,6 @@ router.put('/update', authMiddleware, uploadCloud.single('avatar'), userControll
 // Cập nhật sở thích của user
 router.put('/me/interests', authMiddleware, userController.updateInterests);
 //Tìm kiếm  
-router.get('/global-search', authMiddleware, userController.globalSearch);
+router.get('/global-search', userController.globalSearch);
 
 module.exports = router;

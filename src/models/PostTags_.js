@@ -5,11 +5,11 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
-        posts_id: { // Phải có chữ 's'
+        posts_id: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        tags_id: { // Phải có chữ 's'
+        tags_id: {
             type: DataTypes.INTEGER,
             allowNull: false
         }

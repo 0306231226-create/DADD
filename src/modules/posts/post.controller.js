@@ -3,10 +3,10 @@ const db = require('../../models');
 
 class PostController {
 
+    // Gọi service lấy bài viết của user, có kèm phân trang
     async getPostsByUser(req, res) {
         try {
             const { userId } = req.params;
-
             const page = req.query.page || 1;
             const limit = req.query.limit || 10;
 
@@ -21,6 +21,7 @@ class PostController {
         }
     }
 
+    // Lấy thông tin cá nhân kèm theo mấy cái tag sở thích của user đó
     async getProfile(req, res) {
         try {
             const user = await db.User.findByPk(req.user.id, {
@@ -38,20 +39,7 @@ class PostController {
         }
     }
 
-
-    // async createPost(req, res) {
-    //     try {
-    //         const userId = req.user.id;
-    //         if (!req.body.content) {
-    //             return res.status(400).json({ message: 'Nội dung bài viết không được để trống' });
-    //         }
-    //         const post = await postService.createPost(userId, req.body);
-    //         return res.status(201).json({ status: 'success', data: post });
-    //     } catch (error) {
-    //         return res.status(500).json({ status: 'error', message: error.message });
-    //     }
-    // }
-
+    // Tạo bài mới, có xử lý link ảnh nếu ông user có upload file
     async createPost(req, res) {
         try {
             const userId = req.user.id;
@@ -70,7 +58,7 @@ class PostController {
         }
     }
 
-
+    // Lấy bài viết cho trang chủ
     async getNewsfeed(req, res) {
         try {
             const data = await postService.getNewsfeed(req.user, req.query);
@@ -83,16 +71,14 @@ class PostController {
         }
     }
 
-
-
+    // Sửa bài viết và cập nhật lại đống Tag liên quan
     async updatePost(req, res) {
         try {
-
             const { postId } = req.params;
             const { title, content, tags } = req.body;
             const userId = req.user.id;
 
-
+            // Check xem bài đó có đúng của ông này không
             const post = await db.Post.findOne({
                 where: {
                     id: Number(postId),
@@ -107,10 +93,9 @@ class PostController {
                 });
             }
 
-
             await post.update({ title, content });
 
-
+            // Nếu có gửi kèm danh sách tag mới thì xóa tag cũ đi lưu lại cái mới
             if (tags && Array.isArray(tags)) {
                 const tagObjects = await db.Tag.findAll({
                     attributes: ['id', 'tags_name'],
@@ -118,11 +103,9 @@ class PostController {
                 });
 
                 if (tagObjects.length > 0) {
-
                     await db.PostTag.destroy({
                         where: { posts_id: postId }
                     });
-
 
                     const postTagData = tagObjects.map(t => ({
                         posts_id: postId,
@@ -141,7 +124,7 @@ class PostController {
         }
     }
 
-    
+    // Nhận request share bài rồi đẩy sang bên service xử lý
     async sharePost(req, res) {
         try {
             const { postId } = req.params;
@@ -155,6 +138,22 @@ class PostController {
             });
         } catch (error) {
             return res.status(400).json({ status: 'error', message: error.message });
+        }
+    }
+
+    // Tìm bài viết theo tên tag ví dụ như tìm mấy bài về 'đồ án'
+    async filterByTag(req, res) {
+        try {
+            const tagName = req.query.tagName; 
+            
+            if (!tagName) {
+                return res.status(400).json({ message: 'Thiếu tên Tag' });
+            }
+
+            const posts = await postService.getPostsByTagName(tagName);
+            return res.json({ status: 'success', data: posts });
+        } catch (error) {
+            return res.status(500).json({ status: 'error', message: error.message });
         }
     }
 }

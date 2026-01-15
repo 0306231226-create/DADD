@@ -1,6 +1,7 @@
 const commentService = require('./comment.service');
 
 class CommentController {
+    // Lấy toàn bộ bình luận của một bài viết
     async getComments(req, res) {
         try {
             const { postId } = req.params;
@@ -11,17 +12,16 @@ class CommentController {
                 data: comments
             });
         } catch (error) {
-            return res.status(500).json({
-                status: 'error',
-                message: error.message
-            });
+            return res.status(500).json({ status: 'error', message: error.message });
         }
     }
+
+    // Tạo bình luận mới (Có thể là cmt gốc hoặc cmt cấp 2 nếu có parent_id)
     async createComment(req, res) {
         try {
             const { postId } = req.params;
             const { content, parent_id } = req.body;
-            const userId = req.user.id; // Lấy từ authMiddleware
+            const userId = req.user.id; 
 
             const newComment = await commentService.createComment(
                 userId, 
@@ -36,15 +36,14 @@ class CommentController {
                 data: newComment
             });
         } catch (error) {
-            return res.status(400).json({
-                status: 'error',
-                message: error.message
-            });
+            return res.status(400).json({ status: 'error', message: error.message });
         }
     }
+
+    // Trả lời trực tiếp vào một bình luận khác (Reply)
     async replyComment(req, res) {
         try {
-            const { commentId } = req.params; // ID của comment đang được reply
+            const { commentId } = req.params; 
             const { content } = req.body;
             const userId = req.user.id;
 
@@ -56,17 +55,16 @@ class CommentController {
                 data: reply
             });
         } catch (error) {
-            return res.status(400).json({
-                status: 'error',
-                message: error.message
-            });
+            return res.status(400).json({ status: 'error', message: error.message });
         }
     }
+
+    // Xóa bình luận (Kiểm tra xem có phải chủ nhân hoặc Admin không)
     async deleteComment(req, res) {
         try {
             const { commentId } = req.params;
             const userId = req.user.id;
-            const userRole = req.user.role; // Giả định middleware auth trả về role
+            const userRole = req.user.role; 
 
             await commentService.deleteComment(commentId, userId, userRole);
 
@@ -76,26 +74,25 @@ class CommentController {
             });
         } catch (error) {
             const statusCode = error.message.includes('quyền') ? 403 : 404;
-            return res.status(statusCode).json({
-                status: 'error',
-                message: error.message
-            });
+            return res.status(statusCode).json({ status: 'error', message: error.message });
         }
     }
-    async getOneComment(req, res) {
-    try {
-        const { commentId } = req.params;
-        const comment = await commentService.getCommentById(commentId);
-        
-        if (!comment) {
-            return res.status(404).json({ message: 'Không tìm thấy bình luận' });
-        }
 
-        return res.status(200).json(comment);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+    // Lấy chi tiết một bình luận duy nhất
+    async getOneComment(req, res) {
+        try {
+            const { commentId } = req.params;
+            const comment = await commentService.getCommentById(commentId);
+            
+            if (!comment) {
+                return res.status(404).json({ message: 'Không tìm thấy bình luận' });
+            }
+
+            return res.status(200).json(comment);
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
+        }
     }
-};
 }
 
 module.exports = new CommentController();
