@@ -102,6 +102,25 @@ class UserController {
             return res.status(500).json({ status: 'error', message: error.message });
         }
     }
-} // Kết thúc class UserController
+
+
+    async globalSearch(req, res) {
+    try {
+        const query = req.query.q;
+        if (!query || query.trim() === '') {
+            return res.status(400).json({ message: 'Vui lòng nhập từ khóa' });
+        }
+
+        const results = await userService.searchAll(query);
+
+        return res.json({
+            status: 'success',
+            data: results
+        });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: error.message });
+    }
+}
+} 
 
 module.exports = new UserController();

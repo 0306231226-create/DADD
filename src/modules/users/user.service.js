@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { Sequelize } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 class UserService {
     // Lấy Profile kèm mảng các Tag sở thích
     // async getProfile(userId) {
@@ -20,6 +20,30 @@ class UserService {
 
 
 
+    async searchAll(query) {
+        const users = await db.User.findAll({
+            where: {
+                username: { [Op.like]: `%${query}%` }
+            },
+            attributes: { exclude: ['password'] },
+            order: [['username', 'ASC']],
+            limit: 5
+        });
+
+        const posts = await db.Post.findAll({
+            where: {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${query}%` } },
+                    { content: { [Op.like]: `%${query}%` } }
+                ]
+            },
+            attributes: ['id', 'title', 'content', 'image_url', 'created_at'],
+            order: [['created_at', 'DESC']],
+            limit: 10
+        });
+
+        return { users, posts };
+    }
 
     async getProfile(userId) {
         const user = await db.User.findByPk(userId, {
