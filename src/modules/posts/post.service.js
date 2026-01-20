@@ -116,6 +116,38 @@ class PostService {
             limit: 10 
         });
     }
+    // Thêm vào class PostService trong file post.service.js
+async getPostsByTagId(tagId, page = 1, limit = 10) {
+    const p = parseInt(page) || 1;
+    const l = parseInt(limit) || 10;
+    const offset = (p - 1) * l;
+
+    const result = await postRepository.findByTagIdForScroll(tagId, l, offset);
+    const hasMore = offset + result.rows.length < result.count;
+
+    return {
+        posts: result.rows,
+        totalItems: result.count,
+        currentPage: p,
+        hasMore: hasMore,
+        nextPage: hasMore ? p + 1 : null
+    };
+}
+async getUserPosts(userId, page = 1, limit = 10) {
+    const p = parseInt(page) || 1;
+    const l = parseInt(limit) || 10;
+    const offset = (p - 1) * l;
+    const posts = await postRepository.findByUserIdForScroll(userId, l + 1, offset);
+    
+    const hasMore = posts.length > l;
+    const data = hasMore ? posts.slice(0, l) : posts;
+
+    return {
+        posts: data,
+        hasMore: hasMore,
+        nextPage: hasMore ? p + 1 : null
+    };
+}
 }
 
 module.exports = new PostService();

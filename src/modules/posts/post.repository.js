@@ -96,6 +96,43 @@ class PostRepository {
             posts_id: postId
         });
     }
+    // Thêm vào class PostRepository trong file post.repository.js
+// post.repository.js
+async findByTagIdForScroll(tagId, limit, offset) {
+    const { Tag, User } = require('../../models');
+    return await Post.findAndCountAll({
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        order: [['id', 'DESC']],
+        include: [
+            {
+                model: Tag,
+                as: 'tags', // Phải khớp với 'as' bạn đặt ở index.js
+                where: { id: tagId },
+                through: { attributes: [] }
+            },
+            {
+                model: User,
+                as: 'user',
+                attributes: ['id', 'username', 'avatarurl']
+            }
+        ],
+        distinct: true // Bắt buộc có để đếm đúng số lượng bài viết khi JOIN
+    });
+}
+async findByUserIdForScroll(users_id, limit, offset) {
+    return await Post.findAll({
+        where: { users_id }, 
+        limit: parseInt(limit),
+        offset: parseInt(offset), 
+        order: [['id', 'DESC']], 
+        include: [{ 
+            model: User, 
+            as: 'user', 
+            attributes: ['id', 'username', 'avatarurl'] 
+        }]
+    });
+}
 }
 
 module.exports = new PostRepository();

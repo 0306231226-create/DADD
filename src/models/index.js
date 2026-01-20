@@ -56,15 +56,15 @@ if (db.User && db.Tag && db.UserInterest) {
 if (db.Post && db.Tag && db.PostTag) {
     db.Post.belongsToMany(db.Tag, { 
         through: db.PostTag, 
-        foreignKey: 'post_id', 
-        otherKey: 'tag_id',
+        foreignKey: 'posts_id', 
+        otherKey: 'tags_id',
         as: 'tags' 
     });
 
     db.Tag.belongsToMany(db.Post, { 
         through: db.PostTag, 
-        foreignKey: 'tag_id',
-        otherKey: 'post_id'
+        foreignKey: 'tags_id',
+        otherKey: 'posts_id'
     });
 }
 // 3. Tự động gọi hàm associate bên trong từng file model

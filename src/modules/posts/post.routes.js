@@ -20,6 +20,10 @@ router.post('/:postId/share', authMiddleware, postController.sharePost);
 // Tìm kiếm hoặc lọc bài viết theo mấy cái tag
 router.get('/filter', postController.filterByTag);
 
+router.get('/tag/:tagId', postController.getPostsByTag);
+
+router.get('/user/:userId/posts', postController.getPostsByUser);
+
 const voteController = require('../votes/vote.controller');
 
 // Vote bài viết, cái này cũng phải login mới cho làm

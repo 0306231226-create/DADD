@@ -156,6 +156,35 @@ class PostController {
             return res.status(500).json({ status: 'error', message: error.message });
         }
     }
+async getPostsByTag(req, res) {
+    try {
+        const { tagId } = req.params;
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 10;
+
+        const data = await postService.getPostsByTagId(tagId, page, limit);
+        return res.json({ status: 'success', data });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: error.message });
+    }
+}
+// post.controller.js
+async getPostsByUser(req, res) {
+    try {
+        const { userId } = req.params; // Lấy từ /user/:userId/posts
+        const page = req.query.page || 1; 
+        const limit = req.query.limit || 10;
+
+        const data = await postService.getUserPosts(userId, page, limit);
+
+        return res.json({
+            status: 'success',
+            data: data
+        });
+    } catch (error) {
+        return res.status(500).json({ status: 'error', message: error.message });
+    }
+}
 }
 
 module.exports = new PostController();
