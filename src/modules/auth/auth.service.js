@@ -10,7 +10,10 @@ class AuthService {
         const transaction = await sequelize.transaction();
         try {
             const existingUser = await authRepository.findUserByEmail(email);
-            if (existingUser) throw new Error('Email đã tồn tại');
+            if (existingUser) throw new Error('Email hoặc username đã tồn tại');
+
+            const existingUsername = await authRepository.findUserByUsername(username);
+            if (existingUsername) throw new Error('Email hoặc username đã tồn tại');
 
             const newUser = await authRepository.createUser({ username, email, role: 'user' }, transaction);
             const salt = await bcrypt.genSalt(10);
@@ -21,7 +24,7 @@ class AuthService {
                 password_hash: passwordHash,
                 auth_provider: 'local'
             }, transaction);
-
+            console.log(username, email, password);
             await transaction.commit();
             return { message: 'Đăng ký thành công' };
         } catch (error) {
@@ -30,56 +33,56 @@ class AuthService {
         }
     }
 
-   async refreshToken(token) {
-    try {
-        if (!token) {
-            throw new Error('Không tìm thấy token');
-        }
-        let cleanToken = token;
-        if (typeof token === 'string') {
-            if (token.includes('refreshToken=')) {
-                cleanToken = token.split('refreshToken=')[1].split(';')[0];
+    async refreshToken(token) {
+        try {
+            if (!token) {
+                throw new Error('Không tìm thấy token');
             }
-            cleanToken = cleanToken.trim();
+            let cleanToken = token;
+            if (typeof token === 'string') {
+                if (token.includes('refreshToken=')) {
+                    cleanToken = token.split('refreshToken=')[1].split(';')[0];
+                }
+                cleanToken = cleanToken.trim();
+            }
+
+            if (!process.env.JWT_REFRESH_SECRET) {
+                throw new Error('Server chưa cấu hình mã bí mật REFRESH_SECRET');
+            }
+
+            const decoded = jwt.verify(cleanToken, process.env.JWT_REFRESH_SECRET);
+            const user = await authRepository.findLoginByUserId(decoded.id);
+            if (!user) {
+                throw new Error('Người dùng không tồn tại hoặc đã bị khóa');
+            }
+
+            const payload = {
+                id: user.id,
+                role: user.role
+            };
+
+            const newAccessToken = jwt.sign(
+                payload,
+                process.env.JWT_ACCESS_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            return newAccessToken;
+
+        } catch (error) {
+            console.error("❌ Lỗi Refresh Token:", error.message);
+
+            if (error.name === 'TokenExpiredError') {
+                throw new Error('Phiên làm việc đã hết hạn, vui lòng đăng nhập lại');
+            }
+
+            if (error.name === 'JsonWebTokenError') {
+                throw new Error('Mã xác thực không hợp lệ hoặc đã bị chỉnh sửa');
+            }
+
+            throw error;
         }
-        
-        if (!process.env.JWT_REFRESH_SECRET) {
-            throw new Error('Server chưa cấu hình mã bí mật REFRESH_SECRET');
-        }
-
-        const decoded = jwt.verify(cleanToken, process.env.JWT_REFRESH_SECRET);
-        const user = await authRepository.findLoginByUserId(decoded.id);
-        if (!user) {
-            throw new Error('Người dùng không tồn tại hoặc đã bị khóa');
-        }
-
-        const payload = { 
-            id: user.id, 
-            role: user.role 
-        };
-        
-        const newAccessToken = jwt.sign(
-            payload, 
-            process.env.JWT_ACCESS_SECRET, 
-            { expiresIn: '1h' }
-        );
-
-        return newAccessToken;
-
-    } catch (error) {
-        console.error("❌ Lỗi Refresh Token:", error.message);
-
-        if (error.name === 'TokenExpiredError') {
-            throw new Error('Phiên làm việc đã hết hạn, vui lòng đăng nhập lại');
-        }
-        
-        if (error.name === 'JsonWebTokenError') {
-            throw new Error('Mã xác thực không hợp lệ hoặc đã bị chỉnh sửa');
-        }
-
-        throw error;
     }
-}
 
     async login({ email, password }) {
         const user = await authRepository.findUserByEmail(email);

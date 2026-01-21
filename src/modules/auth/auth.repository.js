@@ -13,12 +13,16 @@ class AuthRepository {
         return await Login.create(loginData, { transaction });
     }
 
+    async findUserByUsername(username) {
+        return await User.findOne({ where: { username } });
+    }
+
     async findLoginByUserId(users_id) {
-    return await Login.findOne({ 
-        where: { users_id }
-         
-    });
-}
+        return await Login.findOne({
+            where: { users_id }
+
+        });
+    }
 
     async updatePassword(users_id, newPasswordHash) {
         return await Login.update(

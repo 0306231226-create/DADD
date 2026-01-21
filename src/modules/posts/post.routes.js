@@ -5,8 +5,7 @@ const postController = require('./post.controller');
 const authMiddleware = require('../../middlewares/auth.middleware');
 const uploadCloud = require('../../config/cloudinary');
 
-router.get('/user/:userId/posts', authMiddleware, postController.getPostsByUser);
-
+router.get('/user/:userId', authMiddleware, postController.getPostsByUser);
 router.put('/:postId', authMiddleware, uploadCloud.single('image'), postController.updatePost);
 router.post('/create', authMiddleware, uploadCloud.single('image'), postController.createPost);
 router.post('/:postId/share', authMiddleware, postController.sharePost);

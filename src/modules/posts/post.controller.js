@@ -21,6 +21,9 @@ class PostController {
         }
     }
 
+
+
+
     async getProfile(req, res) {
         try {
             const user = await db.User.findByPk(req.user.id, {
@@ -141,7 +144,7 @@ class PostController {
         }
     }
 
-    
+
     async sharePost(req, res) {
         try {
             const { postId } = req.params;

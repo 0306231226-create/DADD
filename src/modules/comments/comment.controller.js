@@ -21,8 +21,7 @@ class CommentController {
         try {
             const { postId } = req.params;
             const { content, parent_id } = req.body;
-            const userId = req.user.id; // Lấy từ authMiddleware
-
+            const userId = req.user.id; 
             const newComment = await commentService.createComment(
                 userId, 
                 postId, 
@@ -44,7 +43,7 @@ class CommentController {
     }
     async replyComment(req, res) {
         try {
-            const { commentId } = req.params; // ID của comment đang được reply
+            const { commentId } = req.params; 
             const { content } = req.body;
             const userId = req.user.id;
 
@@ -66,7 +65,7 @@ class CommentController {
         try {
             const { commentId } = req.params;
             const userId = req.user.id;
-            const userRole = req.user.role; // Giả định middleware auth trả về role
+            const userRole = req.user.role; 
 
             await commentService.deleteComment(commentId, userId, userRole);
 

@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         paranoid: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at',
-        deletedAt: 'delete_at'
+        deletedAt: 'deleted_at'
     });
 // src/models/Comment.js
 Comment.associate = (models) => {

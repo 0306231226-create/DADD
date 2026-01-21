@@ -9,7 +9,7 @@ const VOTE_MAP = {
 class VoteService {
     async toggleVote(userId, postId, type) {
         const voteValue = VOTE_MAP[type];
-        
+
         // 1. Tìm vote đã tồn tại
         const existingVote = await voteRepository.findVote(userId, postId);
 
@@ -22,10 +22,10 @@ class VoteService {
                 await voteRepository.update(userId, postId, voteValue);
             }
         } else {
-            // 2. Tạo vote mới - Chú ý tên trường phải khớp với Repository
+
             await voteRepository.create({
                 users_id: userId,
-                post_id: postId, // Đã sửa từ posts_id thành post_id
+                post_id: postId,
                 vote_type: voteValue
             });
         }
@@ -37,17 +37,17 @@ class VoteService {
         await voteRepository.delete(userId, postId);
         return await voteRepository.countTotalScore(postId);
     }
-// Trong VoteService.js
-async getVoteStats(postId) {
-    // Gọi đúng tên hàm vừa tạo ở Repository
-    const stats = await voteRepository.getDetailedStats(postId);
-    
-    return {
-        upvotes: stats.upvotes,
-        downvotes: stats.downvotes,
-        totalScore: stats.upvotes - stats.downvotes
-    };
-}
+
+    async getVoteStats(postId) {
+
+        const stats = await voteRepository.getDetailedStats(postId);
+
+        return {
+            upvotes: stats.upvotes,
+            downvotes: stats.downvotes,
+            totalScore: stats.upvotes - stats.downvotes
+        };
+    }
 }
 
 module.exports = new VoteService();

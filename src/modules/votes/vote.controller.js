@@ -24,10 +24,8 @@ class VoteController {
             const { postId } = req.params;
             const { type } = req.body;
 
-            // Debug để kiểm tra token trong Terminal
-            console.log("Nội dung Token giải mã:", req.user); 
+        //    console.log("Nội dung Token giải mã:", req.user); 
 
-            // Lấy ID an toàn
             const userId = req.user.id || req.user.userId || req.user.users_id;
 
             if (!userId) {
@@ -39,7 +37,6 @@ class VoteController {
 
             const totalScore = await voteService.toggleVote(userId, postId, type);
             
-            // QUAN TRỌNG: Phải có lệnh return res ở đây để Postman nhận được phản hồi
             return res.json({
                 status: 'success',
                 data: { totalScore }

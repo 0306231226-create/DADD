@@ -2,7 +2,6 @@ const { Post, User } = require('../../models');
 const { Op } = require('sequelize');
 
 class PostRepository {
-    // --- MỚI: Thêm hàm findById để fix lỗi ---
     async findById(id) {
         return await Post.findByPk(id, {
             include: [{ 
@@ -13,32 +12,32 @@ class PostRepository {
         });
     }
 
-    // 1. Lấy tất cả bài viết theo User ID (Không phân trang)
-    async findAllByUserId(users_id) {
-        return await Post.findAll({
-            where: { users_id },
-            order: [['id', 'DESC']],
-            include: [{ 
-                model: User, 
+    async findByUserIdForScroll(userId, limit, offset) {
+    return await Post.findAll({
+        where: { 
+            users_id: userId 
+        },
+        include: [
+            {
+                model: User,
                 as: 'user', 
-                attributes: ['username', 'avatarurl'] 
-            }]
-        });
-    }
+                attributes: ['id', 'username', 'avatarurl']
+            }
+        ],
+        limit: limit,
+        offset: offset, 
+        order: [['id', 'DESC']] 
+    });}
 
-    // 2. Tạo bài viết mới
+
+
     async create(postData) {
         return await Post.create(postData);
     }
 
     // 3. Lấy bài viết cho Newsfeed (Có phân trang và lọc theo sở thích)
     async findAllForNewsfeed({ limit, offset, interests = [], sortBy = 'id', order = 'DESC' }) {
-        /*
-        limit → số bài mỗi trang
-        offset → bỏ qua bao nhiêu bài
-        interests = [] → danh sách sở thích (tag, keyword)
-        sortBy = 'id' → cột sắp xếp
-        order = 'DESC' → thứ tự sắp xếp*/
+  
         let whereCondition = { status: 'public' };
 
         if (interests.length > 0) {
