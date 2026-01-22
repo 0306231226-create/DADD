@@ -11,13 +11,7 @@ class VoteService {
     // Hàm xử lý logic thông minh: Tự động tạo mới, đổi loại hoặc hủy vote
     async toggleVote(userId, postId, type) {
         const voteValue = VOTE_MAP[type];
-<<<<<<< HEAD
 
-        // 1. Tìm vote đã tồn tại
-=======
-        
-        // Check xem trong quá khứ ông này đã vote bài này chưa
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
         const existingVote = await voteRepository.findVote(userId, postId);
 
         if (existingVote) {
@@ -29,11 +23,7 @@ class VoteService {
                 await voteRepository.update(userId, postId, voteValue);
             }
         } else {
-<<<<<<< HEAD
 
-=======
-            // Nếu chưa từng vote thì tạo mới một bản ghi vào DB
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
             await voteRepository.create({
                 users_id: userId,
                 post_id: postId,
@@ -51,25 +41,14 @@ class VoteService {
         return await voteRepository.countTotalScore(postId);
     }
 
-<<<<<<< HEAD
+
     async getVoteStats(postId) {
-
         const stats = await voteRepository.getDetailedStats(postId);
-
         return {
             upvotes: stats.upvotes,
             downvotes: stats.downvotes,
             totalScore: stats.upvotes - stats.downvotes
-=======
-    // Lấy số liệu thống kê chi tiết để hiện lên giao diện bài viết
-    async getVoteStats(postId) {
-        const stats = await voteRepository.getDetailedStats(postId);
-        
-        return {
-            upvotes: stats.upvotes,
-            downvotes: stats.downvotes,
-            totalScore: stats.upvotes - stats.downvotes // Điểm tổng kết cuối cùng
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
+
         };
     }
 }

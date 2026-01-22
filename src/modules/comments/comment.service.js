@@ -16,7 +16,7 @@ class CommentService {
 
         allComments.forEach(c => {
             const node = commentMap[c.id];
-            // Kiểm tra cột 'parent' theo đúng cấu trúc DB của bạn
+       
             if (node.parent) {
                 if (commentMap[node.parent]) {
                     commentMap[node.parent].replies.push(node);
@@ -36,18 +36,18 @@ class CommentService {
         return await commentRepository.create({
             users_id: userId,
             posts_id: postId,
-            comment: content, // Đảm bảo cột này đã được sửa thành 'content' trong DB
+            comment: content, 
             parent_id: parentId
         });
     }
     async replyComment(userId, parentCommentId, contentValue) {
-        // 1. Kiểm tra comment cha có tồn tại không
+       
         const parentComment = await commentRepository.findById(parentCommentId);
         if (!parentComment) {
             throw new Error('Bình luận cha không tồn tại');
         }
 
-        // 2. Tạo comment con (reply)
+       
         
         return await commentRepository.create({
             users_id: userId,

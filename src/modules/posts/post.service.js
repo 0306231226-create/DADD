@@ -3,22 +3,8 @@ const db = require('../../models');
 const { Op } = require('sequelize');
 
 class PostService {
-<<<<<<< HEAD
 
-    async getUserPosts(userId, page = 1, limit = 10) {
-        const p = parseInt(page) || 1;
-        const l = parseInt(limit) || 10;
-        const offset = (p - 1) * l;
-        const posts = await postRepository.findByUserIdForScroll(userId, l + 1, offset);
 
-        const hasMore = posts.length > l;
-        const data = hasMore ? posts.slice(0, l) : posts;
-
-        return {
-            posts: data,
-            hasMore: hasMore,
-            nextPage: hasMore ? p + 1 : null
-=======
     async getUserPosts(userId, page = 1, limit = 10) {
         const offset = (page - 1) * limit;
         // Lấy thêm 1 bản ghi để check xem còn bài nào phía sau không
@@ -32,23 +18,22 @@ class PostService {
             posts: data,
             hasMore: hasMore,
             nextPage: hasMore ? parseInt(page) + 1 : null
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
         };
     }
 
     async createPost(userId, postData) {
         const payload = {
             users_id: userId,
-<<<<<<< HEAD
+
             title: postData.title,
-=======
-            title: postData.title, 
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
+
+     title: postData.title, 
+
             content: postData.content,
             image_url: postData.image_url || null,
             status: 'public'
         };
-<<<<<<< HEAD
+
 
         const newPost = await postRepository.create(payload);
         return await postRepository.findById(newPost.id);
@@ -129,7 +114,7 @@ class PostService {
 
     async sharePost(userId, postId) {
         // 1. Kiểm tra bài viết tồn tại
-=======
+
         
         const newPost = await postRepository.create(payload);
         // Tạo xong thì gọi lại hàm tìm theo id để lấy đủ thông tin bài mới
@@ -184,7 +169,7 @@ class PostService {
     }
 
     async sharePost(userId, postId) {
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
+
         const post = await db.Post.findByPk(postId);
         if (!post) {
             throw new Error('Bài viết không tồn tại');

@@ -15,7 +15,7 @@ class AuthService {
             const existingUsername = await authRepository.findUserByUsername(username);
             if (existingUsername) throw new Error('Email hoặc username đã tồn tại');
 
-            const newUser = await authRepository.createUser({ username, email, role: 'user' }, transaction);
+            const newUser = await authRepository.createUser({ username, email,brithday, role: 'user' }, transaction);
             const salt = await bcrypt.genSalt(10);
             const passwordHash = await bcrypt.hash(password, salt);
 

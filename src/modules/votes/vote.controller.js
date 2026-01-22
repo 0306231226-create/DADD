@@ -25,12 +25,7 @@ class VoteController {
             const { postId } = req.params;
             const { type } = req.body; // type thường là 'up' hoặc 'down'
 
-<<<<<<< HEAD
-        //    console.log("Nội dung Token giải mã:", req.user); 
-=======
-            // In ra xem token có lấy được đúng user đang đăng nhập không
-            console.log("Nội dung Token giải mã:", req.user); 
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
+
 
             const userId = req.user.id || req.user.userId || req.user.users_id;
 

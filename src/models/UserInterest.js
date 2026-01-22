@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
         }
     }, {
-        tableName: 'user_interests', // Tên bảng thực tế trong MySQL
+        tableName: 'user_interests', 
         timestamps: false
     });
 

@@ -1,7 +1,7 @@
 const commentService = require('./comment.service');
 
 class CommentController {
-    // Lấy toàn bộ bình luận của một bài viết
+    
     async getComments(req, res) {
         try {
             const { postId } = req.params;
@@ -16,16 +16,11 @@ class CommentController {
         }
     }
 
-    // Tạo bình luận mới (Có thể là cmt gốc hoặc cmt cấp 2 nếu có parent_id)
     async createComment(req, res) {
         try {
             const { postId } = req.params;
             const { content, parent_id } = req.body;
             const userId = req.user.id; 
-<<<<<<< HEAD
-=======
-
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
             const newComment = await commentService.createComment(
                 userId, 
                 postId, 
@@ -43,7 +38,7 @@ class CommentController {
         }
     }
 
-    // Trả lời trực tiếp vào một bình luận khác (Reply)
+  
     async replyComment(req, res) {
         try {
             const { commentId } = req.params; 
@@ -62,7 +57,7 @@ class CommentController {
         }
     }
 
-    // Xóa bình luận (Kiểm tra xem có phải chủ nhân hoặc Admin không)
+
     async deleteComment(req, res) {
         try {
             const { commentId } = req.params;
@@ -81,7 +76,7 @@ class CommentController {
         }
     }
 
-    // Lấy chi tiết một bình luận duy nhất
+ 
     async getOneComment(req, res) {
         try {
             const { commentId } = req.params;

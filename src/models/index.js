@@ -17,7 +17,7 @@ const sequelize = new Sequelize(
     }
 );
 
-// 1. Tự động nạp các file models
+
 fs.readdirSync(__dirname)
     .filter(file => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
@@ -35,7 +35,7 @@ fs.readdirSync(__dirname)
             console.error(`❌ Lỗi khi nạp file model: ${file}`, error);
         }
     });
-//Phần thiết lập quan hệ
+
 if (db.User && db.Tag && db.UserInterest) {
     db.User.belongsToMany(db.Tag, { 
         through: db.UserInterest, 

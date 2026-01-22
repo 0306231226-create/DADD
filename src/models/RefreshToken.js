@@ -26,7 +26,6 @@ module.exports = (sequelize, DataTypes) => {
         }
     );
 
-    // Thiết lập quan hệ nếu cần
     RefreshToken.associate = (models) => {
         RefreshToken.belongsTo(models.User, { foreignKey: 'users_id' });
     };

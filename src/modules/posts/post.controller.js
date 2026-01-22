@@ -20,14 +20,6 @@ class PostController {
             return res.status(500).json({ status: 'error', message: error.message });
         }
     }
-
-<<<<<<< HEAD
-
-
-
-=======
-    // Lấy thông tin cá nhân kèm theo mấy cái tag sở thích của user đó
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
     async getProfile(req, res) {
         try {
             const user = await db.User.findByPk(req.user.id, {
@@ -130,11 +122,7 @@ class PostController {
         }
     }
 
-<<<<<<< HEAD
 
-=======
-    // Nhận request share bài rồi đẩy sang bên service xử lý
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
     async sharePost(req, res) {
         try {
             const { postId } = req.params;
@@ -154,8 +142,8 @@ class PostController {
     // Tìm bài viết theo tên tag ví dụ như tìm mấy bài về 'đồ án'
     async filterByTag(req, res) {
         try {
-            const tagName = req.query.tagName; 
-            
+            const tagName = req.query.tagName;
+
             if (!tagName) {
                 return res.status(400).json({ message: 'Thiếu tên Tag' });
             }
@@ -166,35 +154,35 @@ class PostController {
             return res.status(500).json({ status: 'error', message: error.message });
         }
     }
-async getPostsByTag(req, res) {
-    try {
-        const { tagId } = req.params;
-        const page = req.query.page || 1;
-        const limit = req.query.limit || 10;
+    async getPostsByTag(req, res) {
+        try {
+            const { tagId } = req.params;
+            const page = req.query.page || 1;
+            const limit = req.query.limit || 10;
 
-        const data = await postService.getPostsByTagId(tagId, page, limit);
-        return res.json({ status: 'success', data });
-    } catch (error) {
-        return res.status(500).json({ status: 'error', message: error.message });
+            const data = await postService.getPostsByTagId(tagId, page, limit);
+            return res.json({ status: 'success', data });
+        } catch (error) {
+            return res.status(500).json({ status: 'error', message: error.message });
+        }
     }
-}
-// post.controller.js
-async getPostsByUser(req, res) {
-    try {
-        const { userId } = req.params; // Lấy từ /user/:userId/posts
-        const page = req.query.page || 1; 
-        const limit = req.query.limit || 10;
+    // post.controller.js
+    async getPostsByUser(req, res) {
+        try {
+            const { userId } = req.params; // Lấy từ /user/:userId/posts
+            const page = req.query.page || 1;
+            const limit = req.query.limit || 10;
 
-        const data = await postService.getUserPosts(userId, page, limit);
+            const data = await postService.getUserPosts(userId, page, limit);
 
-        return res.json({
-            status: 'success',
-            data: data
-        });
-    } catch (error) {
-        return res.status(500).json({ status: 'error', message: error.message });
+            return res.json({
+                status: 'success',
+                data: data
+            });
+        } catch (error) {
+            return res.status(500).json({ status: 'error', message: error.message });
+        }
     }
-}
 }
 
 module.exports = new PostController();

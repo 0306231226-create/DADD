@@ -2,10 +2,7 @@ const { Post, User } = require('../../models');
 const { Op } = require('sequelize');
 
 class PostRepository {
-<<<<<<< HEAD
-=======
-    // Tìm 1 bài viết theo ID và lấy luôn thông tin người đăng
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
+
     async findById(id) {
         return await Post.findByPk(id, {
             include: [{ 
@@ -16,7 +13,7 @@ class PostRepository {
         });
     }
 
-<<<<<<< HEAD
+
     async findByUserIdForScroll(userId, limit, offset) {
     return await Post.findAll({
         where: { 
@@ -25,15 +22,6 @@ class PostRepository {
         include: [
             {
                 model: User,
-=======
-    // Hốt hết bài viết của 1 user, sắp xếp cái mới nhất lên đầu
-    async findAllByUserId(users_id) {
-        return await Post.findAll({
-            where: { users_id },
-            order: [['id', 'DESC']],
-            include: [{ 
-                model: User, 
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
                 as: 'user', 
                 attributes: ['id', 'username', 'avatarurl']
             }
@@ -44,21 +32,13 @@ class PostRepository {
     });}
 
 
-
-<<<<<<< HEAD
-=======
-    // Lưu bài viết mới vào database
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
     async create(postData) {
         return await Post.create(postData);
     }
 
     // Lấy bài cho Newsfeed, có xử lý lọc theo sở thích nếu có truyền vào
     async findAllForNewsfeed({ limit, offset, interests = [], sortBy = 'id', order = 'DESC' }) {
-<<<<<<< HEAD
-  
-=======
->>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
+
         let whereCondition = { status: 'public' };
 
         // Nếu có sở thích thì tìm các bài có tiêu đề hoặc nội dung chứa từ khóa đó
