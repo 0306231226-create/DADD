@@ -9,10 +9,10 @@ module.exports = (sequelize, DataTypes) => {
         users_id: { type: DataTypes.INTEGER, allowNull: false },
         posts_id: { type: DataTypes.INTEGER, allowNull: false }
     }, {
-        tableName: 'share_posts', // Khớp với tên trong ảnh của bạn
+        tableName: 'share_posts', 
         timestamps: true,
         createdAt: 'created_at',
-        updatedAt: false // Ảnh cho thấy bạn chỉ dùng created_at
+        updatedAt: false
     });
 
     return SharePost;

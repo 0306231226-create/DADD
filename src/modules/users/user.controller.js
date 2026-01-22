@@ -2,7 +2,7 @@ const userService = require('./user.service');
 const db = require('../../models');
 
 class UserController {
-    // 1. Lấy thông tin cá nhân kèm sở thích
+    // Lấy thông tin cá nhân của mình, bao gồm cả mấy cái sở thích đã chọn
     async getProfile(req, res) {
         try {
             const userId = req.user.id;
@@ -19,29 +19,12 @@ class UserController {
         }
     }
 
-    // 2. Cập nhật thông tin cơ bản (tên, avatar, phone...)
-    // async updateProfile(req, res) {
-    //     try {
-    //         const userId = req.user.id;
-    //         const updatedUser = await userService.updateProfile(userId, req.body);
-    //         return res.json({ 
-    //             status: 'success', 
-    //             message: 'Cập nhật thông tin thành công', 
-    //             data: updatedUser 
-    //         });
-    //     } catch (error) {
-    //         return res.status(400).json({ 
-    //             status: 'error', 
-    //             message: error.message 
-    //         });
-    //     }
-    // }
-
-
+    // Cập nhật profile (tên, sđt...), có xử lý nếu user đổi ảnh đại diện mới
     async updateProfile(req, res) {
         try {
             const userId = req.user.id;
             const updateData = { ...req.body };
+            // Nếu có up file ảnh thì lấy đường dẫn từ Cloudinary/Multer đẩy vào DB
             if (req.file) {
                 updateData.avatarurl = req.file.path;
             }
@@ -60,22 +43,20 @@ class UserController {
         }
     }
 
-
-
-    // 3. Cập nhật sở thích (Xử lý mảng tên tag)
+    // Cập nhật danh sách sở thích (Tags)
     async updateInterests(req, res) {
         try {
             const userId = req.user.id;
             const { interests } = req.body;
 
-            // 1. Kiểm tra Model trung gian có tồn tại không
+            // Check xem model bảng trung gian có chạy ổn không
             if (!db.UserInterest) {
                 throw new Error("Model UserInterest chưa được nạp. Kiểm tra file models/index.js");
             }
 
-            // 2. Tìm Tags và ép buộc KHÔNG lấy cột 'name'
+            // Tìm ID của các tag dựa trên tên tag mà user gửi lên
             const tags = await db.Tag.findAll({
-                attributes: ['id', 'tags_name'], // Chỉ lấy id và tags_name
+                attributes: ['id', 'tags_name'], 
                 where: { tags_name: interests }
             });
 
@@ -83,7 +64,7 @@ class UserController {
                 return res.status(400).json({ status: 'error', message: "Không tìm thấy sở thích nào khớp." });
             }
 
-            // 3. Xóa cũ và thêm mới trực tiếp vào bảng trung gian
+            // Xóa hết đống sở thích cũ của user này rồi mới nạp cái mới vào
             await db.UserInterest.destroy({ where: { users_id: userId } });
 
             const bulkData = tags.map(tag => ({
@@ -91,6 +72,7 @@ class UserController {
                 tag_id: tag.id
             }));
 
+            // Lưu hàng loạt vào bảng trung gian
             await db.UserInterest.bulkCreate(bulkData);
 
             return res.json({
@@ -103,24 +85,24 @@ class UserController {
         }
     }
 
-
+    // Tìm kiếm lung tung cả user lẫn bài viết theo từ khóa
     async globalSearch(req, res) {
-    try {
-        const query = req.query.q;
-        if (!query || query.trim() === '') {
-            return res.status(400).json({ message: 'Vui lòng nhập từ khóa' });
+        try {
+            const query = req.query.q;
+            if (!query || query.trim() === '') {
+                return res.status(400).json({ message: 'Vui lòng nhập từ khóa' });
+            }
+
+            const results = await userService.searchAll(query);
+
+            return res.json({
+                status: 'success',
+                data: results
+            });
+        } catch (error) {
+            return res.status(500).json({ status: 'error', message: error.message });
         }
-
-        const results = await userService.searchAll(query);
-
-        return res.json({
-            status: 'success',
-            data: results
-        });
-    } catch (error) {
-        return res.status(500).json({ status: 'error', message: error.message });
     }
-}
 } 
 
 module.exports = new UserController();

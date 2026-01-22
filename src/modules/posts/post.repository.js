@@ -2,6 +2,10 @@ const { Post, User } = require('../../models');
 const { Op } = require('sequelize');
 
 class PostRepository {
+<<<<<<< HEAD
+=======
+    // Tìm 1 bài viết theo ID và lấy luôn thông tin người đăng
+>>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
     async findById(id) {
         return await Post.findByPk(id, {
             include: [{ 
@@ -12,6 +16,7 @@ class PostRepository {
         });
     }
 
+<<<<<<< HEAD
     async findByUserIdForScroll(userId, limit, offset) {
     return await Post.findAll({
         where: { 
@@ -20,6 +25,15 @@ class PostRepository {
         include: [
             {
                 model: User,
+=======
+    // Hốt hết bài viết của 1 user, sắp xếp cái mới nhất lên đầu
+    async findAllByUserId(users_id) {
+        return await Post.findAll({
+            where: { users_id },
+            order: [['id', 'DESC']],
+            include: [{ 
+                model: User, 
+>>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
                 as: 'user', 
                 attributes: ['id', 'username', 'avatarurl']
             }
@@ -31,15 +45,23 @@ class PostRepository {
 
 
 
+<<<<<<< HEAD
+=======
+    // Lưu bài viết mới vào database
+>>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
     async create(postData) {
         return await Post.create(postData);
     }
 
-    // 3. Lấy bài viết cho Newsfeed (Có phân trang và lọc theo sở thích)
+    // Lấy bài cho Newsfeed, có xử lý lọc theo sở thích nếu có truyền vào
     async findAllForNewsfeed({ limit, offset, interests = [], sortBy = 'id', order = 'DESC' }) {
+<<<<<<< HEAD
   
+=======
+>>>>>>> 1e5e2ce1a907a32510a080997fd9e87b4a11ffb8
         let whereCondition = { status: 'public' };
 
+        // Nếu có sở thích thì tìm các bài có tiêu đề hoặc nội dung chứa từ khóa đó
         if (interests.length > 0) {
             whereCondition[Op.or] = interests.map(tag => ({
                 [Op.or]: [
@@ -49,6 +71,7 @@ class PostRepository {
             }));
         }
 
+        // Trả về cả danh sách bài và tổng số lượng bài để làm phân trang
         return await Post.findAndCountAll({
             where: whereCondition,
             limit: parseInt(limit),
@@ -62,7 +85,7 @@ class PostRepository {
         });
     }
 
-    // 4. Lấy bài viết theo User ID (Có phân trang để scroll)
+    // Lấy bài viết của user theo kiểu phân đoạn để load dần khi cuộn trang
     async findByUserIdForScroll(users_id, limit, offset) {
         return await Post.findAll({
             where: { users_id },
@@ -77,26 +100,65 @@ class PostRepository {
         });
     }
 
-    // 5. Cập nhật bài viết
+    // Cập nhật thông tin bài viết và trả về dữ liệu mới nhất sau khi sửa
     async update(id, updateData) {
         await Post.update(updateData, {
             where: { id }
         });
-        // Gọi hàm findById vừa thêm ở trên
         return await this.findById(id); 
     }
+
+    // Tăng số lượng lượt share trong bảng bài viết lên 1 đơn vị
     async incrementShareCount(postId) {
         return await db.Post.increment('share_count', {
             where: { id: postId }
         });
     }
+
+    // Tạo bản ghi mới ghi nhận ông nào vừa share bài nào
     async createShare(userId, postId) {
-        // Tạo một dòng mới trong bảng share_posts
         return await db.SharePost.create({
             users_id: userId,
             posts_id: postId
         });
     }
+    // Thêm vào class PostRepository trong file post.repository.js
+// post.repository.js
+async findByTagIdForScroll(tagId, limit, offset) {
+    const { Tag, User } = require('../../models');
+    return await Post.findAndCountAll({
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        order: [['id', 'DESC']],
+        include: [
+            {
+                model: Tag,
+                as: 'tags', // Phải khớp với 'as' bạn đặt ở index.js
+                where: { id: tagId },
+                through: { attributes: [] }
+            },
+            {
+                model: User,
+                as: 'user',
+                attributes: ['id', 'username', 'avatarurl']
+            }
+        ],
+        distinct: true // Bắt buộc có để đếm đúng số lượng bài viết khi JOIN
+    });
+}
+async findByUserIdForScroll(users_id, limit, offset) {
+    return await Post.findAll({
+        where: { users_id }, 
+        limit: parseInt(limit),
+        offset: parseInt(offset), 
+        order: [['id', 'DESC']], 
+        include: [{ 
+            model: User, 
+            as: 'user', 
+            attributes: ['id', 'username', 'avatarurl'] 
+        }]
+    });
+}
 }
 
 module.exports = new PostRepository();

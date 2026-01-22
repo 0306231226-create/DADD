@@ -89,7 +89,6 @@ class UserService {
         const user = await db.User.findByPk(userId);
         if (!user) throw new Error('Người dùng không tồn tại');
 
-        // Chỉ cho phép update các field an toàn
         const allowedUpdates = [
             'username',
             'avatarurl',

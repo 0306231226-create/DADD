@@ -1,13 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
     const RefreshToken = sequelize.define(
-        'RefreshToken', // Tên model nên viết hoa chữ cái đầu, số ít
+        'RefreshToken',
         {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true
             },
-            users_id: { // Lưu ý: Database của bạn thường dùng users_id (có s), hãy kiểm tra lại SQL
+            users_id: { 
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {

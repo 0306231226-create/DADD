@@ -14,11 +14,18 @@ module.exports = (sequelize, DataTypes) => {
         timestamps: false
     });
 
-    Post.associate = (models) => {
-        if (models.User) {
-            Post.belongsTo(models.User, { foreignKey: 'users_id', as: 'user' });
-        }
-    };
-
+Post.associate = (models) => {
+    if (models.User) {
+        Post.belongsTo(models.User, { foreignKey: 'users_id', as: 'user' });
+    }
+    if (models.Tag && models.PostTag) {
+        Post.belongsToMany(models.Tag, { 
+            through: models.PostTag, 
+            foreignKey: 'posts_id', 
+            otherKey: 'tags_id',
+            as: 'post_tags' 
+        });
+    }
+};
     return Post;
 };

@@ -4,7 +4,7 @@ const db = require('../../models');
 class CommentService {
     async getCommentsByPost(postId) {
         const allComments = await commentRepository.findAllByPostId(postId);
-        
+
         const commentMap = {};
         const roots = [];
 
@@ -48,22 +48,21 @@ class CommentService {
         }
 
         // 2. Tạo comment con (reply)
-        // Lưu ý: posts_id của con phải giống posts_id của cha
+        
         return await commentRepository.create({
             users_id: userId,
             posts_id: parentComment.posts_id,
-            comment: contentValue, // Tên cột trong DB là 'comment'
-            parent_id: parentCommentId // Cột thực tế trong DB là 'parent' (đã map trong Model)
+            comment: contentValue, 
+            parent_id: parentCommentId 
         });
     }
     async deleteComment(commentId, userId, userRole) {
         const comment = await commentRepository.findById(commentId);
-        
+
         if (!comment) {
             throw new Error('Bình luận không tồn tại');
         }
 
-        // Kiểm tra quyền: Phải là chủ comment (users_id) hoặc là Admin
         if (comment.users_id !== userId && userRole !== 'admin') {
             throw new Error('Bạn không có quyền xóa bình luận này');
         }
@@ -71,9 +70,9 @@ class CommentService {
         return await commentRepository.softDelete(commentId);
     }
     async getCommentById(commentId) {
-    // Chỉ lấy dữ liệu bảng Comment, không lôi bảng User vào
-    return await db.Comment.findByPk(commentId); 
-};
+
+        return await db.Comment.findByPk(commentId);
+    };
 }
 
 module.exports = new CommentService();
