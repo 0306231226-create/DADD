@@ -5,8 +5,6 @@ const postController = require('./post.controller');
 const authMiddleware = require('../../middlewares/auth.middleware');
 const uploadCloud = require('../../config/cloudinary');
 
-// Lấy danh sách bài viết của một ông nào đó, cần login mới xem được
-router.get('/user/:userId/posts', authMiddleware, postController.getPostsByUser);
 
 // Cập nhật bài viết, có cho upload đè ảnh mới lên Cloudinary
 router.put('/:postId', authMiddleware, uploadCloud.single('image'), postController.updatePost);
@@ -22,7 +20,7 @@ router.get('/filter', postController.filterByTag);
 
 router.get('/tag/:tagId', postController.getPostsByTag);
 
-router.get('/user/:userId/posts', postController.getPostsByUser);
+router.get('/user/:userId', postController.getPostsByUser);
 
 const voteController = require('../votes/vote.controller');
 
@@ -45,3 +43,64 @@ const optionalAuth = (req, res, next) => {
 router.get('/', optionalAuth, postController.getNewsfeed);
 
 module.exports = router;
+
+
+
+
+/**
+ * @swagger
+ * tags:
+ * name: Posts
+ * description: Quản lý bài viết và Phân trang
+ */
+
+/**
+ * @swagger
+ * /api/posts/user/{userId}/posts:
+ * get:
+ * summary: Lấy danh sách bài viết của một User (Có phân trang)
+ * tags: [Posts]
+ * parameters:
+ * - in: path
+ * name: userId
+ * required: true
+ * schema:
+ * type: integer
+ * - in: query
+ * name: page
+ * schema:
+ * type: integer
+ * default: 1
+ * description: Số trang hiện tại
+ * - in: query
+ * name: limit
+ * schema:
+ * type: integer
+ * default: 10
+ * description: Số bài viết mỗi trang
+ * responses:
+ * 200:
+ * description: Trả về mảng posts, hasMore và nextPage
+ */
+
+/**
+ * @swagger
+ * /api/posts/tag/{tagId}:
+ * get:
+ * summary: Lấy bài viết theo Tag (Có phân trang)
+ * tags: [Posts]
+ * parameters:
+ * - in: path
+ * name: tagId
+ * required: true
+ * schema:
+ * type: integer
+ * - in: query
+ * name: page
+ * schema:
+ * type: integer
+ * default: 1
+ * responses:
+ * 200:
+ * description: Danh sách bài viết có chứa tag này
+ */

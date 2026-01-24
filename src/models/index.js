@@ -5,19 +5,56 @@ const basename = path.basename(__filename);
 require('dotenv').config();
 
 const db = {};
+let sequelize;
 
-const sequelize = new Sequelize(
-    process.env.DB_NAME || 'dadd', 
-    process.env.DB_USER || 'root', 
-    process.env.DB_PASS || '', 
-    {
-        host: process.env.DB_HOST || 'localhost',
-        dialect: 'mysql',
-        logging: false
+
+if (process.env.DATABASE_URL) {
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+        dialect: 'postgres',
+        protocol: 'postgres',
+        logging: false,
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false 
+            }
+        }
+    });
+} else {
+    
+    sequelize = new Sequelize(
+        process.env.DB_NAME || 'dadd',
+        process.env.DB_USER || 'root',
+        process.env.DB_PASS || '',
+        {
+            host: process.env.DB_HOST || 'localhost',
+            dialect: 'mysql',
+            logging: false
+        }
+    );
+}
+
+
+fs.readdirSync(__dirname)
+    .filter(file => {
+        return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+    })
+    .forEach(file => {
+        const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+        db[model.name] = model;
+    });
+
+
+Object.keys(db).forEach(modelName => {
+    if (db[modelName].associate) {
+        db[modelName].associate(db);
     }
-);
+});
 
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
+module.exports = db;
 fs.readdirSync(__dirname)
     .filter(file => {
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
@@ -67,7 +104,7 @@ if (db.Post && db.Tag && db.PostTag) {
         otherKey: 'posts_id'
     });
 }
-// 3. Tự động gọi hàm associate bên trong từng file model
+
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
         db[modelName].associate(db);
